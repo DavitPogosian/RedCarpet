@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:gravity="center_vertical|center_horizontal">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/prof_img"
+        android:layout_width="78dp"
+        android:layout_height="80dp"
+        android:src="@drawable/prof_pic_def"
+        app:border_color="@color/ImgBorder"
+        app:border_width="3dp"
+        android:layout_marginTop="12dp"
+        android:layout_alignParentStart="true"
+        />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:id="@+id/product_name"
+            />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Number"
+            android:id="@+id/product_name_ro"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp"/>
+
+
+
+    </LinearLayout>
+    <CheckBox
+        android:text=""
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkBox" />
+
+</LinearLayout>

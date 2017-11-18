@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/add_party"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.davit.redcarpet.AddPartyActivity"
+    android:background="@color/back">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:inputType="date"
+        android:ems="10"
+        android:layout_alignTop="@+id/party_img"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="14dp"
+        android:id="@+id/date"
+        android:background="@drawable/edittextback"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:hint="Date"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:inputType="time"
+        android:ems="10"
+        android:layout_marginTop="15dp"
+        android:id="@+id/timestart"
+        android:background="@drawable/edittextback"
+        android:layout_below="@+id/date"
+        android:layout_alignStart="@+id/date"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:hint="Start time"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:inputType="time"
+        android:ems="10"
+        android:id="@+id/timeend"
+        android:background="@drawable/edittextback"
+        android:layout_alignBottom="@+id/party_img"
+        android:layout_alignStart="@+id/timestart"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:hint="End time"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Adress here"
+        android:ems="20"
+        android:layout_marginTop="48dp"
+        android:id="@+id/adress_of"
+        android:background="@drawable/edittextback"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:layout_below="@+id/party_img"
+        android:layout_alignParentStart="true"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Adress hint here (optional)"
+        android:ems="10"
+        android:layout_marginTop="65dp"
+        android:id="@+id/adress_hint"
+        android:background="@drawable/edittextback"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:layout_below="@+id/adress_of"
+        android:layout_alignParentStart="true"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Description here (optional)"
+        android:ems="10"
+        android:layout_marginTop="54dp"
+        android:id="@+id/description"
+        android:background="@drawable/edittextback"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:layout_below="@+id/adress_hint"
+        android:layout_alignParentStart="true"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/party_img"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/party_def_ic"
+        app:border_color="@color/ImgBorder"
+        app:border_width="3dp"
+        android:layout_marginTop="57dp"
+        android:layout_below="@+id/Name"
+        android:layout_alignParentStart="true"
+        android:clickable="true"
+        android:onClick="SetPartyPic"/>
+
+    <EditText
+       android:layout_width="match_parent"
+       android:layout_height="30dp"
+       android:inputType="textPersonName"
+        android:id="@+id/Name"
+       android:textAlignment="center"
+       android:textColor="@color/edittextText"
+       android:background="@drawable/edittextback"
+        android:layout_marginTop="26dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:imeOptions="actionDone"
+        android:hint="Name Here"
+        android:textColorHint="@color/edittextText"/>
+
+    <Button
+        android:text="Add Party"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/button3"
+        android:background="@drawable/buttonback"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/buttonText"
+        android:onClick="add"/>
+
+</RelativeLayout>

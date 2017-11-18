@@ -28,6 +28,13 @@ dependencies {
     compile 'com.android.support:design:25.0.0'
     testCompile 'junit:junit:4.12'
 
+    //for API
     compile files('libs/apache-httpcomponents-httpcore.jar')
     compile files('libs/httpclient-4.0.3.jar')
+
+    //circleimageview
+    compile 'de.hdodenhof:circleimageview:1.3.0'
+
+    //Picasso
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

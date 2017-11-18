@@ -11,11 +11,14 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -136,6 +139,59 @@ public class ApiConnector {
 
     }
 
+    public String AddParty() {
+
+        //// TODO: 11/18/2017 change url
+        String url = "";
+        HttpEntity httpEntity = null;
+
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
+            //// TODO: 11/18/2017 create pair  
+            nameValuePair.add(new BasicNameValuePair("username", "test_user"));
+            nameValuePair.add(new BasicNameValuePair("password", "123456789"));
+
+
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                // write response to log
+                Log.d("Http Post Response:", httpResponse.toString());
+                httpEntity = httpResponse.getEntity();
+            } catch (ClientProtocolException e) {
+                // Log exception
+                e.printStackTrace();
+            } catch (IOException e) {
+                // Log exception
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            // Log exception
+            e.printStackTrace();
+        }
+
+            String entityResponse = null;
+
+            if (httpEntity != null) {
+                try {
+                    entityResponse = EntityUtils.toString(httpEntity);
+                    Log.e("Entity Response  : ", entityResponse);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return entityResponse;
+        }
 
 
     public String Edit(String am_name, String ru_name, String ro_name, String en_name, String priceAM, String priceRO, String quantity, String type, String data, int id)
