@@ -64,11 +64,11 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textPersonName"
         android:hint="Adress here"
         android:ems="20"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="40dp"
         android:id="@+id/adress_of"
         android:background="@drawable/edittextback"
         android:textAlignment="center"
@@ -81,11 +81,11 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textPersonName"
         android:hint="Adress hint here (optional)"
         android:ems="10"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="40dp"
         android:id="@+id/adress_hint"
         android:background="@drawable/edittextback"
         android:textAlignment="center"
@@ -98,11 +98,11 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textPersonName"
         android:hint="Description here (optional)"
         android:ems="10"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="40dp"
         android:id="@+id/description"
         android:background="@drawable/edittextback"
         android:textAlignment="center"

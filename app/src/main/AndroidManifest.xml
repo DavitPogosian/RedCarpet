@@ -24,7 +24,9 @@
             android:name=".CreateProfileActivity"
             android:label="@string/title_activity_create_profile"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AddPartyActivity"></activity>
+        <activity android:name=".AddPartyActivity" />
+        <activity android:name=".PartyDetailsActivity" />
+        <activity android:name=".NewProfileActivity"></activity>
     </application>
 
 </manifest>

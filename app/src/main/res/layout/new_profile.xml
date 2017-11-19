@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/new_profile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.davit.redcarpet.NewProfileActivity">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/prof_pic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/prof_pic_def"
+        app:border_color="@color/ImgBorder"
+        app:border_width="3dp"
+        android:clickable="true"
+        android:onClick="SetProfPic"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/name"
+        android:layout_below="@+id/prof_pic"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/edittextback"
+        android:textColor="@color/edittextText"
+        android:textAlignment="center"
+        android:hint="Name here"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Phon Number"
+        android:textSize="29dp"
+        android:ems="10"
+        android:layout_below="@+id/name"
+        android:layout_marginTop="30dp"
+        android:id="@+id/phon"
+        android:background="@drawable/edittextback"
+        android:textColor="@color/edittextText"
+        android:textAlignment="center" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_below="@+id/phon"
+        android:layout_marginTop="30dp"
+        android:id="@+id/adress"
+        android:background="@drawable/edittextback"
+        android:textColor="@color/edittextText"
+        android:textAlignment="center"
+        android:hint="Adress here (optional)"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"/>
+
+    <Button
+        android:text="save"
+        android:layout_width="110dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button"
+        android:background="@drawable/buttonback"
+        android:textColor="@color/buttonText"
+        android:onClick="save"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_marginTop="31dp"
+        android:id="@+id/info"
+        android:background="@drawable/edittextback"
+        android:textColor="@color/edittextText"
+        android:textAlignment="center"
+        android:hint="About you (optional)"
+        android:textColorHint="@color/edittextText"
+        android:imeOptions="actionDone"
+        android:layout_below="@+id/adress"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

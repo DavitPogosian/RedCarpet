@@ -47,15 +47,18 @@ public class AddPartyActivity extends AppCompatActivity {
     public String imageData;
     boolean img_is_set=false;
     String Number;
-
+    String user_id;
+    SharedPreferences sp;
 
     private static final int SELECT_PICTURE = 1;
-    private static final int MAX_NAME_LENGHT = 1;
-    private static final int MAX_Adress_LENGHT = 1;
-    private static final int MAX_AdressHInt_LENGHT = 1;
-    private static final int MAX_Description_LENGHT = 1;
+    private static final int MAX_NAME_LENGHT = 70;
+    private static final int MAX_Adress_LENGHT = 100;
+    private static final int MAX_AdressHInt_LENGHT = 200;
+    private static final int MAX_Description_LENGHT = 500;
     private static final String TAG = "AddPartyActivity";
-    private static final  String phonsp="Phon";
+    private static final  String phonNumber_sp="Number";
+    private static final  String uder_id_sp="ID";
+    private static final  String sp_Name="userinfo";
 
 
     @Override
@@ -72,11 +75,10 @@ public class AddPartyActivity extends AppCompatActivity {
         PartyImage = (CircleImageView) findViewById(R.id.party_img);
 
         setDate();
-        //// TODO: 11/18/2017  get phone number
-//        SharedPreferences sp;
-//        sp= getSharedPreferences("mysp",MODE_PRIVATE);
-//        Number=sp.getString(phonsp,"");
-
+        //// TODO: 11/18/2017  get phone number and user id
+        sp= getSharedPreferences(sp_Name,MODE_PRIVATE);
+        Number=sp.getString(phonNumber_sp,"");
+        user_id=String.valueOf(sp.getInt(uder_id_sp,0));
     }
 
     public void setDate()
@@ -96,9 +98,7 @@ public class AddPartyActivity extends AppCompatActivity {
     {
         if(validation())
         {
-            //// TODO: 11/18/2017 add to external DB
             new AddParty().execute(new ApiConnector());
-
 
         }
         Log.e(TAG, "add: "+ validation() );
@@ -106,13 +106,19 @@ public class AddPartyActivity extends AppCompatActivity {
 
     private class AddParty extends AsyncTask<ApiConnector, Long, String>
     {
+        String name= Name.getText().toString();
+        String date=Date.getText().toString();
+        String start=StartTime.getText().toString();
+        String end=EndTime.getText().toString();
+        String andress=Adress.getText().toString();
+        String adresshint=AdressHInt.getText().toString();
+        String description=Description.getText().toString();
+        String image=Number+"_"+Name.getText().toString();
         @Override
         //protected JSONArray doInBackground(ApiConnector... params)
         protected String doInBackground(ApiConnector... params)
         {
-
-            //// TODO: 11/18/2017 add parameters
-            return params[0].AddParty();
+            return params[0].AddParty(name, date, start, end, andress, adresshint, description, user_id, image);
         }
 
         @Override
@@ -123,6 +129,7 @@ public class AddPartyActivity extends AppCompatActivity {
             try {
                String  Result=jsonArray;
                 Log.d("Result","Result = "+Result);
+                if(img_is_set)
                 uploadImg();
             } catch (Exception e) {
                 Log.d("Logul din error", "onPostExecute");

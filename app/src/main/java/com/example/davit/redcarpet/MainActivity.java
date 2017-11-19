@@ -1,6 +1,7 @@
 package com.example.davit.redcarpet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +17,14 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    SharedPreferences sp;
+    int id;
+
+    private static final  String sp_Name="userinfo";
+    private static final  String phonNumber_sp="Number";
+    private static final  String uder_id_sp="ID";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,21 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+        sp= getSharedPreferences(sp_Name,MODE_PRIVATE);
+        String Number=sp.getString(phonNumber_sp,"");
+        id=sp.getInt(uder_id_sp,0);
+        if(Number.length()==0)
+        {
+            //// TODO: 11/19/2017 dialog (login / create new)
+        }
+        else if(id==0)
+        {
+            //// TODO: 11/19/2017 downloade id
+        }
+
     }
 
     @Override
@@ -94,7 +118,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(go);
 
         } else if (id == R.id.nav_send) {
-
+            Intent go = new Intent(MainActivity.this, PartyDetailsActivity.class);
+            startActivity(go);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
