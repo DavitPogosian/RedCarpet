@@ -7,4 +7,6 @@
     <color name="buttonText">#BEFF85</color>
     <color name="edittextText">#ffffff</color>
     <color name="back">#d1e9de</color>
+    <color name="welcomTextColor">#c9802c27</color>
+    <color name="error">#ff0c00</color>
 </resources>

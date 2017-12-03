@@ -1,10 +1,7 @@
 package com.example.davit.redcarpet;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,10 +10,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -24,8 +19,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
@@ -36,12 +36,13 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class NewProfileActivity extends AppCompatActivity {
-
+public class EditMyProfileActivity extends AppCompatActivity {
 
     String Number;
     int id;
     String nameForsp;
+
+    String NEWnameForsp;
     boolean img_is_set;
     String imageData;
 
@@ -65,93 +66,101 @@ public class NewProfileActivity extends AppCompatActivity {
     private static final int ERROR_MESSAGE_MIN_LENGHT = 20;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_profile);
-
-        setNumber();
-        // TODO: 11/20/2017 heto sax petqa poxes nenc vor hamarn taza petqa qcvi db , qceluc heto idn staci u hamarn u idn qci sp-i mej
+        setContentView(R.layout.edit_my_profile);
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
-//        Number=sp.getString(phonNumber_sp,"");
-//        id=sp.getInt(user_id_sp,0);
-//        if((Number.length()==0)||(id==0))
-//        {
-//            gotomain();
-//        }
-        //todo save aneluc heto ete amen inch chotki a het tar main  manu
-
+        checkinfo();
         Name = (EditText) findViewById(R.id.name);
         Adress = (EditText) findViewById(R.id.adress);
         Info = (EditText) findViewById(R.id.info);
         PhonNumber = (TextView) findViewById(R.id.phon);
         ProfPic = (CircleImageView) findViewById(R.id.prof_pic);
+        new EditMyProfileActivity.GetUserByID().execute(new ApiConnector());    }
 
-    }
 
-    public void setNumber() {
-        if (checkpermission()) {
-            try {
-                TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-                    return;
-                }
-                String mPhoneNumber = tMgr.getLine1Number();
-                Log.e("Number",mPhoneNumber);
-                PhonNumber=(TextView) findViewById(R.id.phon);
-                PhonNumber.setText(mPhoneNumber);
-                Number = mPhoneNumber;
-            } catch (Exception e) {
-                Log.e(TAG, e.toString());
-            }
-
-        }
-    }
-    public boolean checkpermission()
+    public void SetUserInformation(JSONArray jsonArray)
     {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG,"Permission is granted");
-                return true;
-            } else {
+        // TODO: 03/12/2017 chi poxum nor anun@ spum ( hinna mnum misht)
 
-                Log.v(TAG,"Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-                return true;
-            }
-        }
-        else {
-            Log.v(TAG,"Permission is granted");
-            return true;
+        Name.setText(nameForsp);
+        PhonNumber.setText(Number);
+        try {
+            //`id`, `number`, `name`, `adress`, `info`, `image`
+            JSONObject jsonObject = jsonArray.getJSONObject(0);//or 0
+            Adress.setText(jsonObject.getString("adress"));
+            Info.setText(jsonObject.getString("info"));
+            String url = "https://redcarpetproject.000webhostapp.com/images/" + Number + ".jpg";
+            Log.e("url", url);
+            Picasso.with(this).load(url)
+                    .placeholder(R.drawable.prof_pic_def)
+                    .error(R.drawable.prof_pic_def)
+                    .into(ProfPic);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
+    public  boolean checkinfo()
+    {
+        Number=sp.getString(phonNumber_sp,"");
+        id=sp.getInt(user_id_sp,0);
+        nameForsp=sp.getString(user_name_sp,"");
+        if((Number.length()==0)||(id==0)||(nameForsp.length()==0))
+        {
+            gotohome(null);
+            return  false;
+        }
+
+        return true;
+    }
+
+    public void gotohome(View v)
+    {
+        Intent go = new Intent(this, MainActivity.class);
+        startActivity(go);
+    }
+
+    private class GetUserByID extends AsyncTask<ApiConnector,Long,JSONArray>
+    {
+        @Override
+        protected JSONArray doInBackground(ApiConnector... params) {
+            return params[0].GetUserByID(id);
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) {
+            SetUserInformation(jsonArray);
+
+
+        }
+    }
+
+
+
+
 
     public void save(View view)
     {
         if(validation())
         {
-            String name= Name.getText().toString();
-            String adres=Adress.getText().toString();
-            String info=Info.getText().toString();
-            nameForsp = Name.getText().toString();
-            new AddProfile().execute(new ApiConnector());
+            new EditMyProfileActivity.EditProfile().execute(new ApiConnector());
         }
     }
-    private class AddProfile extends AsyncTask<ApiConnector, Long, String>
+    private class EditProfile extends AsyncTask<ApiConnector, Long, String>
     {
-        String name= Name.getText().toString();
+        String NEWnameForsp= Name.getText().toString();
         String adres=Adress.getText().toString();
         String info=Info.getText().toString();
         @Override
-        //protected JSONArray doInBackground(ApiConnector... params)
         protected String doInBackground(ApiConnector... params)
         {
             if(img_is_set)
-            return params[0].AddProfile(Number,name, adres, info, Number);
+                return params[0].EditProfile(id,Number,NEWnameForsp, adres, info, Number);
 
-            return params[0].AddProfile(Number,name, adres, info,"def");
+            return params[0].EditProfile(id,Number,NEWnameForsp, adres, info,"def");
         }
 
         @Override
@@ -165,7 +174,7 @@ public class NewProfileActivity extends AppCompatActivity {
                     if (img_is_set)
                         uploadImg();
                     else
-                    gotohome();
+                        gotohome(null);
                 }else
                 {
                     Log.e(TAG,Result);
@@ -187,18 +196,17 @@ public class NewProfileActivity extends AppCompatActivity {
         {
             return false;
         }
-        id=Integer.parseInt(Result);
         SharedPreferences.Editor ed = sp.edit();
-        ed.putString(phonNumber_sp,Number);
-        ed.putInt(user_id_sp,id);
-        ed.putString(user_name_sp,nameForsp);
+        ed.putString(user_name_sp,NEWnameForsp);
+        Log.e("NEWnameForsp",NEWnameForsp);
         if(!ed.commit())
         {
             Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
         }
+        gotohome(null);
 
 
-     return true;
+        return true;
     }
     public boolean validation()
     {
@@ -282,18 +290,9 @@ public class NewProfileActivity extends AppCompatActivity {
     private void SetImage(Bitmap image) {
         this.ProfPic.setImageBitmap(image);
         img_is_set=true;
-
-        // upload
         imageData = encodeTobase64(image);
 
 
-    }
-
-
-    public void gotohome()
-    {
-        Intent go = new Intent(this,MainActivity.class);
-        startActivity(go);
     }
 
 
@@ -311,7 +310,7 @@ public class NewProfileActivity extends AppCompatActivity {
             protected void onPostExecute(Boolean Result)
             {
                 if(Result) {
-                    gotohome();
+                    gotohome(null);
                 }else{
                     Toast.makeText(getApplicationContext(), "Something goes wrong : Please try again", Toast.LENGTH_LONG).show();
                 }
@@ -337,5 +336,4 @@ public class NewProfileActivity extends AppCompatActivity {
 
         return imageEncoded;
     }
-
 }

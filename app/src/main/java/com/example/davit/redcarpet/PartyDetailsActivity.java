@@ -13,6 +13,7 @@ public class PartyDetailsActivity extends AppCompatActivity {
 
     RatingBar ratingBar;
     CircleImageView party_pic;
+    int Party_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +21,9 @@ public class PartyDetailsActivity extends AppCompatActivity {
         party_pic=(CircleImageView) findViewById(R.id.party_img);
         setButonText();
         setImages();
+        Party_id = getIntent().getIntExtra("PartyID",-1);
+        Log.e("Party_id",""+Party_id);
+        // TODO: 02/12/2017 get all info of party by id
     }
     public void setButonText()
     {

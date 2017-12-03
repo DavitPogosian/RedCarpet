@@ -1,10 +1,17 @@
 package com.example.davit.redcarpet;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,57 +21,106 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    SharedPreferences sp;
-    int id;
+    private ListView Parties;
+    private JSONArray jsonArray;
 
-    private static final  String sp_Name="userinfo";
-    private static final  String phonNumber_sp="Number";
-    private static final  String uder_id_sp="ID";
+    Context context=this;
+    TextView nav_usr_name;
+
+    int id;
+    String user_number;
+    String user_name;
+
+    CircleImageView pic;
+
+    SharedPreferences sp;
+    private static final String sp_Name = "userinfo";
+    private static final String phonNumber_sp = "Number";
+    private static final String user_id_sp = "ID";
+    private static final String user_name_sp = "Name";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
+        sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
 
-        sp= getSharedPreferences(sp_Name,MODE_PRIVATE);
-        String Number=sp.getString(phonNumber_sp,"");
-        id=sp.getInt(uder_id_sp,0);
-        if(Number.length()==0)
-        {
-            //// TODO: 11/19/2017 dialog (login / create new)
-        }
-        else if(id==0)
-        {
-            //// TODO: 11/19/2017 downloade id
+        id = sp.getInt(user_id_sp, 0);
+        user_number = sp.getString(phonNumber_sp, "");
+        user_name = sp.getString(user_name_sp, "");
+
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putString(phonNumber_sp, "0488443770");
+        ed.putInt(user_id_sp, 4);
+        ed.putString(user_name_sp, "Davit");
+        ed.commit();
+
+
+        if (user_number.length() == 0) {
+            Log.e("number leght", "" + user_number.length());
+            showDialog(1);
+            //// TODO: 11/19/2017 test login
+        } else if (id == 0) {
+            //// TODO: 11/19/2017 downloade id and set in sp
+        } else if (user_name.length() == 0) {
+            //// TODO: 11/19/2017 downloade user_name and set in sp
         }
 
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        View hView = navigationView.getHeaderView(0);
+        nav_usr_name = (TextView) hView.findViewById(R.id.name);
+        nav_usr_name.setText(user_name);
+        pic = (CircleImageView) hView.findViewById(R.id.prof_pic);
+        String url = "https://redcarpetproject.000webhostapp.com/images/" + user_number + ".jpg";
+        Log.e("url", url);
+        Picasso.with(this).load(url)
+                .placeholder(R.drawable.prof_pic_def)
+                .error(R.drawable.prof_pic_def)
+                .into(pic);
+
+        Parties = (ListView) findViewById(R.id.allpartylist);
+        new GetAllParties().execute(new ApiConnector());
+        this.Parties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+
+                    JSONObject productClicked = jsonArray.getJSONObject(position);
+                    Intent showDetails = new Intent(getApplicationContext(), PartyDetailsActivity.class);
+                    showDetails.putExtra("PartyID", productClicked.getInt("Id"));
+                    startActivity(showDetails);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        });
     }
 
     @Override
@@ -97,7 +153,37 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+
     }
+
+
+    protected Dialog onCreateDialog(int id) {
+        if (id == 1) {
+            AlertDialog.Builder adb = new AlertDialog.Builder(this);
+            LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+            adb.setView(inflater.inflate(R.layout.new_user_dialog, null));
+            //adb.setTitle("Delete");
+           // adb.setMessage("Are you sure you want to delete this word?");
+            adb.setPositiveButton("Sign up", myClickListener);
+            adb.setNegativeButton("Log in", myClickListener);
+            adb.setIcon(android.R.drawable.ic_dialog_info);
+            return adb.create();
+        } return super.onCreateDialog(id);
+    }
+    DialogInterface.OnClickListener myClickListener = new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                case Dialog.BUTTON_POSITIVE:
+                    Intent go = new Intent(getBaseContext(),NewProfileActivity.class);
+                    startActivity(go);
+                    break;
+                case Dialog.BUTTON_NEGATIVE:
+                     go = new Intent(getBaseContext(),LoginActivity.class);
+                    startActivity(go);
+                    break;
+            }
+        }
+    };
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -105,25 +191,63 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+        if (id == R.id.new_party) {
             Intent go = new Intent(MainActivity.this, AddPartyActivity.class);
             startActivity(go);
+        } else if (id == R.id.settings) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.my_party) {
             Intent go = new Intent(MainActivity.this, PartyDetailsActivity.class);
             startActivity(go);
+
+
+        } else if (id == R.id.sing_out) {
+            SharedPreferences.Editor ed = sp.edit();
+            ed.putString(phonNumber_sp,"");
+            ed.putInt(user_id_sp,0);
+            ed.putString(user_name_sp,"");
+            if(!ed.commit())
+            {
+                Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
+            }else
+                {
+                    finish();
+                    startActivity(getIntent());
+                }
+
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void gotoEditProfile(View v)
+    {
+        Intent go = new Intent(this,EditMyProfileActivity.class);
+        startActivity(go);
+    }
+    public void setListAdapter(JSONArray jsonArray)
+    {
+        Log.d("JSON_object","jsonArray_setListAdapter= "+jsonArray);
+        this.jsonArray=jsonArray;
+        this.Parties.setAdapter(new AllPartiesAdapter(jsonArray,this));
+
+    }
+    private class GetAllParties extends AsyncTask<ApiConnector,Long,JSONArray>
+    {
+        @Override
+        protected JSONArray doInBackground(ApiConnector... params) {
+            return params[0].GetAllParties();
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) {
+            setListAdapter(jsonArray);
+
+
+        }
+    }
+
 }

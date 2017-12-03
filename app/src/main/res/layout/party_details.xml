@@ -11,12 +11,12 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.davit.redcarpet.AddPartyActivity"
-    android:background="@color/back">
+    android:background="@drawable/back">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:layout_alignParentStart="true">
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.example.davit.redcarpet.AddPartyActivity"
-            android:background="@color/back">
+            android:background="@drawable/back">
 
 
             <TextView
@@ -236,7 +236,8 @@
                 android:layout_alignParentStart="true"
                 android:clickable="true"
                 android:onClick="zoomout"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                tools:ignore="OnClick" />
         </RelativeLayout>
 </ScrollView>
 </RelativeLayout>

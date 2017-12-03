@@ -3,6 +3,9 @@
     package="com.example.davit.redcarpet">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -20,13 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".CreateProfileActivity"
-            android:label="@string/title_activity_create_profile"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".AddPartyActivity" />
         <activity android:name=".PartyDetailsActivity" />
-        <activity android:name=".NewProfileActivity"></activity>
+        <activity android:name=".NewProfileActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".EditMyProfileActivity"></activity>
     </application>
 
 </manifest>
