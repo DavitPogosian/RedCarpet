@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/Name"
         android:gravity="center"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/partiItemText"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/party_image"
@@ -33,7 +34,8 @@
         android:layout_marginTop="12dp"
         android:id="@+id/adress"
         android:layout_below="@+id/party_image"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/partiItemText"/>
 
     <TextView
         android:id="@+id/End"
@@ -43,7 +45,8 @@
         android:layout_below="@+id/Start"
         android:layout_marginEnd="67dp"
         android:layout_marginTop="17dp"
-        android:text="End" />
+        android:text="End"
+        android:textColor="@color/partiItemText"/>
 
     <TextView
         android:id="@+id/Start"
@@ -52,7 +55,8 @@
         android:layout_alignEnd="@+id/End"
         android:layout_alignTop="@+id/party_image"
         android:layout_marginTop="31dp"
-        android:text="Start" />
+        android:text="Start"
+        android:textColor="@color/partiItemText"/>
 
     <TextView
         android:id="@+id/textView"
@@ -61,7 +65,8 @@
         android:layout_alignTop="@+id/Start"
         android:layout_marginEnd="32dp"
         android:layout_toStartOf="@+id/Start"
-        android:text="From" />
+        android:text="From"
+        android:textColor="@color/partiItemText"/>
 
     <TextView
         android:id="@+id/textView3"
@@ -69,6 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/textView"
         android:layout_alignTop="@+id/End"
-        android:text="To" />
+        android:text="To"
+        android:textColor="@color/partiItemText"/>
 
 </RelativeLayout>

@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.davit.redcarpet.AddPartyActivity"
+    tools:context="com.example.davit.redcarpet.EditMyPartyActivity"
     android:background="@drawable/back">
 
     <EditText
@@ -127,13 +127,13 @@
         android:onClick="SetPartyPic"/>
 
     <EditText
-       android:layout_width="match_parent"
-       android:layout_height="30dp"
-       android:inputType="textPersonName"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:inputType="textPersonName"
         android:id="@+id/Name"
-       android:textAlignment="center"
-       android:textColor="@color/edittextText"
-       android:background="@drawable/edittextback"
+        android:textAlignment="center"
+        android:textColor="@color/edittextText"
+        android:background="@drawable/edittextback"
         android:layout_marginTop="26dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -142,14 +142,25 @@
         android:textColorHint="@color/edittextText"/>
 
     <Button
-        android:text="Add Party"
+        android:id="@+id/button3"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:id="@+id/button3"
-        android:background="@drawable/buttonback"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/buttonText"
-        android:onClick="add"/>
+        android:layout_alignParentStart="true"
+        android:background="@drawable/buttonback"
+        android:onClick="add"
+        android:text="Add Party"
+        android:textColor="@color/buttonText" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/timeend"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/buttonback"
+        android:onClick="delete"
+        android:text="Dekete Party"
+        android:textColor="@color/buttonText" />
 
 </RelativeLayout>

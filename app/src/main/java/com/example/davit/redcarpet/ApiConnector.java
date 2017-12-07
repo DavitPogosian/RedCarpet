@@ -67,6 +67,135 @@ public class ApiConnector {
 
         return jsonArray;
     }
+    public JSONArray MyParties(int id)
+    {
+        String url = baseurl+"MyParties.php";
+
+
+        HttpEntity httpEntity = null;
+
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(9);
+            nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                // write response to log
+                Log.d("Http Post Response:", httpResponse.toString());
+                httpEntity = httpResponse.getEntity();
+            } catch (ClientProtocolException e) {
+                // Log exception
+                e.printStackTrace();
+            } catch (IOException e) {
+                // Log exception
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            // Log exception
+            e.printStackTrace();
+        }
+
+        String entityResponse = null;
+        JSONArray jsonArray = null;
+        if (httpEntity != null) {
+            try {
+                entityResponse = EntityUtils.toString(httpEntity);
+                Log.e("Entity Response  : ", entityResponse);
+                jsonArray = new JSONArray(entityResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return jsonArray;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//        HttpEntity httpEntity = null;
+//
+//        try
+//        {
+//
+//            DefaultHttpClient httpClient = new DefaultHttpClient();  // Default HttpClient
+//            HttpPost httpPost = new HttpPost(url);
+//            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
+//            nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
+//            HttpResponse httpResponse = httpClient.execute(httpPost);
+//
+//
+//            try {
+//                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//            httpEntity = httpResponse.getEntity();
+//
+//        } catch (ClientProtocolException e) {
+//
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        JSONArray jsonArray1 = null;
+//
+//        if (httpEntity != null) {
+//            try {
+//                String entityResponse = EntityUtils.toString(httpEntity);
+//
+//                Log.d("Entity Response  : ", entityResponse);
+//
+//                jsonArray1 = new JSONArray(entityResponse);
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return jsonArray;
+    }
 
     public JSONArray GetPartyById(int id)
     {

@@ -27,12 +27,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Davit on 02/12/2017.
  */
-public class AllPartiesAdapter extends BaseAdapter {
+public class PartiesAdapter extends BaseAdapter {
     private static final String  startImageUrl="https://redcarpetproject.000webhostapp.com/images/";
     private JSONArray dataArray;
     private Activity activity;
     public static LayoutInflater inflater = null;
-    public AllPartiesAdapter(JSONArray jsonArray, Activity a)
+    public PartiesAdapter(JSONArray jsonArray, Activity a)
     {
         this.dataArray=jsonArray;
         this.activity=a;

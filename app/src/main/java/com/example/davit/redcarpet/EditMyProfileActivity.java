@@ -84,7 +84,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
 
     public void SetUserInformation(JSONArray jsonArray)
     {
-        // TODO: 03/12/2017 chi poxum nor anun@ spum ( hinna mnum misht)
+        // TODO: 03/12/2017 chi poxum nor anun@ spum ( hinna mnum misht) redirect to main
 
         Name.setText(nameForsp);
         PhonNumber.setText(Number);
