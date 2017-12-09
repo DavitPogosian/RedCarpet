@@ -148,8 +148,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:background="@drawable/buttonback"
-        android:onClick="add"
-        android:text="Add Party"
+        android:onClick="save"
+        android:text="Save"
         android:textColor="@color/buttonText" />
 
     <Button

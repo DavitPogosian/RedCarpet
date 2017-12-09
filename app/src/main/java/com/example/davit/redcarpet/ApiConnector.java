@@ -197,15 +197,14 @@ public class ApiConnector {
 //        return jsonArray;
     }
 
-    public JSONArray GetPartyById(int id)
+    public JSONArray GetPartyById(String id)
     {
-        String ID= String.valueOf(id);
         String url = baseurl+"GetPartyById.php";
         HttpEntity httpEntity = null;
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
-        nameValuePair.add(new BasicNameValuePair("id", ID));
+        nameValuePair.add(new BasicNameValuePair("id", id));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
         } catch (UnsupportedEncodingException e) {
@@ -661,5 +660,65 @@ public class ApiConnector {
 
         return jsonArray;
     }
+
+    public String EditParty(String name, String date , String start, String end, String andress, String adresshint, String description, String user_id,String image, int id ) {
+        // Party(name, date, start, end, andress, adresshint, description, user_id, image)
+        String url = baseurl+"EditParty.php";
+        HttpEntity httpEntity = null;
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(10);
+            nameValuePair.add(new BasicNameValuePair("name", name));
+            nameValuePair.add(new BasicNameValuePair("date", date));
+            nameValuePair.add(new BasicNameValuePair("start", start));
+            nameValuePair.add(new BasicNameValuePair("end", end));
+            nameValuePair.add(new BasicNameValuePair("andress", andress));
+            nameValuePair.add(new BasicNameValuePair("adresshint", adresshint));
+            nameValuePair.add(new BasicNameValuePair("description", description));
+            nameValuePair.add(new BasicNameValuePair("user_id", user_id));
+            nameValuePair.add(new BasicNameValuePair("image", image));
+            nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
+
+
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                // write response to log
+                Log.d("Http Post Response:", httpResponse.toString());
+                httpEntity = httpResponse.getEntity();
+            } catch (ClientProtocolException e) {
+                // Log exception
+                e.printStackTrace();
+            } catch (IOException e) {
+                // Log exception
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            // Log exception
+            e.printStackTrace();
+        }
+
+
+        String entityResponse = null;
+
+        if (httpEntity != null) {
+            try {
+                entityResponse = EntityUtils.toString(httpEntity);
+                Log.e("Entity Response  : ", entityResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return entityResponse;
+    }
+
 }
 

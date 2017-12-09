@@ -18,8 +18,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
@@ -91,21 +96,26 @@ public class EditMyPartyActivity extends AppCompatActivity {
         Number=sp.getString(phonNumber_sp,"");
         user_id=String.valueOf(sp.getInt(user_id_sp,0));
 
-        // TODO: 07/12/2017   setpraty();
+        // TODO: 07/12/2017
+        setpraty();
 
     }
 
-    public void add(View view)
+    private void setpraty() {
+        new EditMyPartyActivity.GetPartyByID().execute(new ApiConnector());
+    }
+
+    public void save(View view)
     {
         if(validation())
         {
-            new AddPartyActivity.AddParty().execute(new ApiConnector());
+            new EditMyPartyActivity.EditParty().execute(new ApiConnector());
 
         }
         Log.e(TAG, "add: "+ validation() );
     }
 
-    private class AddParty extends AsyncTask<ApiConnector, Long, String>
+    private class EditParty extends AsyncTask<ApiConnector, Long, String>
     {
         String name= Name.getText().toString();
         String date=Date.getText().toString();
@@ -119,7 +129,7 @@ public class EditMyPartyActivity extends AppCompatActivity {
         //protected JSONArray doInBackground(ApiConnector... params)
         protected String doInBackground(ApiConnector... params)
         {
-            return params[0].AddParty(name, date, start, end, andress, adresshint, description, user_id, image);
+            return params[0].EditParty(name, date, start, end, andress, adresshint, description, user_id, image,Party_id);
         }
 
         @Override
@@ -132,6 +142,8 @@ public class EditMyPartyActivity extends AppCompatActivity {
                 Log.d("Result","Result = "+Result);
                 if(img_is_set)
                     uploadImg();
+                else gotoHome();
+
             } catch (Exception e) {
                 Log.d("Logul din error", "onPostExecute");
                 e.printStackTrace();
@@ -313,15 +325,10 @@ public class EditMyPartyActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean result)
             {
-                gohome();
+                gotoHome();
             }
         }.execute(new ApiConnector());
 
-    }
-
-    private void gohome() {
-        Intent go = new Intent(this, MainActivity.class);
-        startActivity(go);
     }
 
 
@@ -339,5 +346,52 @@ public class EditMyPartyActivity extends AppCompatActivity {
         String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
 
         return imageEncoded;
+    }
+
+
+    private class GetPartyByID extends AsyncTask<ApiConnector, Long, JSONArray>
+    {
+        private static final String  startImageUrl="https://redcarpetproject.000webhostapp.com/images/";
+
+        @Override
+        //protected JSONArray doInBackground(ApiConnector... params)
+        protected JSONArray doInBackground(ApiConnector... params)
+        {
+            return params[0].GetPartyById(String.valueOf(Party_id));
+        }
+
+        @Override
+        //protected void onPostExecute(JSONArray jsonArray)
+        protected void onPostExecute(JSONArray jsonArray)
+        {
+            try {
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+                if ( !user_id.equals(jsonObject.getString("user_id")));
+
+                {
+                    Log.e("curent user!= user","current = "+user_id+" original= "+jsonObject.getString("user_id"));
+                }
+                //(`Id`, `name`, `date`, `start`, `end`, `andress`, `adresshint`, `description`, `user_id`, `image`
+                Name.setText(jsonObject.getString("name"));
+                Date .setText(jsonObject.getString("date"));
+                StartTime.setText(jsonObject.getString("start"));
+                EndTime.setText(jsonObject.getString("end"));
+                Adress.setText(jsonObject.getString("andress"));
+                AdressHInt.setText(jsonObject.getString("adresshint"));
+                Description.setText(jsonObject.getString("description"));
+                String imageName=jsonObject.getString("image");
+                String fullUrlForimg=startImageUrl+imageName+".jpg";
+                Picasso.with(getApplicationContext()).load(fullUrlForimg)
+                        .placeholder(R.drawable.party_def_ic)
+                        .error(R.drawable.party_def_ic)
+                        .into(PartyImage);
+                img_is_set=true;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }
