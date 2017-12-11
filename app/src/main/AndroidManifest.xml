@@ -29,7 +29,8 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".EditMyProfileActivity" />
         <activity android:name=".MyPartiesActivity" />
-        <activity android:name=".EditMyPartyActivity"></activity>
+        <activity android:name=".EditMyPartyActivity" />
+        <activity android:name=".AgendaActivity"></activity>
     </application>
 
 </manifest>

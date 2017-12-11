@@ -371,6 +371,7 @@ public class EditMyPartyActivity extends AppCompatActivity {
 
                 {
                     Log.e("curent user!= user","current = "+user_id+" original= "+jsonObject.getString("user_id"));
+                    gotoHome();
                 }
                 //(`Id`, `name`, `date`, `start`, `end`, `andress`, `adresshint`, `description`, `user_id`, `image`
                 Name.setText(jsonObject.getString("name"));

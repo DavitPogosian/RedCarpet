@@ -194,7 +194,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.my_party) {
             Intent go = new Intent(MainActivity.this, MyPartiesActivity.class);
             startActivity(go);
-
+        } else if (id == R.id.agenda) {
+            Intent go = new Intent(MainActivity.this, AgendaActivity.class);
+            startActivity(go);
 
         } else if (id == R.id.sing_out) {
             SharedPreferences.Editor ed = sp.edit();

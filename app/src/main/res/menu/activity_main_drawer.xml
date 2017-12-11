@@ -15,6 +15,10 @@
             android:id="@+id/my_party"
             android:icon="@drawable/party"
             android:title="My Parties" />
+        <item
+            android:id="@+id/agenda"
+            android:icon="@drawable/agenda"
+            android:title="Agenda" />
     </group>
 
     <item android:title="Communicate">
