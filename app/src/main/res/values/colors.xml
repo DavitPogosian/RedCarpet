@@ -10,4 +10,5 @@
     <color name="welcomTextColor">#c9802c27</color>
     <color name="error">#ff0c00</color>
     <color name="partiItemText">#ffffff</color>
+    <color name="chatText">#ffffff</color>
 </resources>

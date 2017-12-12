@@ -96,7 +96,6 @@ public class EditMyPartyActivity extends AppCompatActivity {
         Number=sp.getString(phonNumber_sp,"");
         user_id=String.valueOf(sp.getInt(user_id_sp,0));
 
-        // TODO: 07/12/2017
         setpraty();
 
     }

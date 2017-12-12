@@ -18,6 +18,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -28,7 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -43,10 +48,14 @@ public class AddPartyActivity extends AppCompatActivity {
     EditText Description;
     CircleImageView PartyImage;
 
+    private DatabaseReference root = FirebaseDatabase.getInstance().getReference().getRoot();
+
     public String imageData;
     boolean img_is_set=false;
+
     String Number;
     String user_id;
+
     SharedPreferences sp;
 
     private static final int SELECT_PICTURE = 1;
@@ -60,6 +69,8 @@ public class AddPartyActivity extends AppCompatActivity {
     private static final  String sp_Name="userinfo";
 
 
+    // TODO: 12/12/2017 add animation while user will white , finish animation before goHOme()
+    // TODO: 12/12/2017 the user can not have 2 or more parties with the same name
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +85,6 @@ public class AddPartyActivity extends AppCompatActivity {
         PartyImage = (CircleImageView) findViewById(R.id.party_img);
 
         setDate();
-        //// TODO: 11/18/2017  get phone number and user id
         sp= getSharedPreferences(sp_Name,MODE_PRIVATE);
         Number=sp.getString(phonNumber_sp,"");
         user_id=String.valueOf(sp.getInt(uder_id_sp,0));
@@ -130,6 +140,7 @@ public class AddPartyActivity extends AppCompatActivity {
                 Log.d("Result","Result = "+Result);
                 if(img_is_set)
                 uploadImg();
+                createChatRoom();
             } catch (Exception e) {
                 Log.d("Logul din error", "onPostExecute");
                 e.printStackTrace();
@@ -287,10 +298,13 @@ public class AddPartyActivity extends AppCompatActivity {
 
     }
 
+    public void createChatRoom ()
+    {
 
-
-
-
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put(Number+"_"+Name.getText().toString(),"");
+        root.updateChildren(map);
+    }
     public void uploadImg() {
         final List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("image", imageData));

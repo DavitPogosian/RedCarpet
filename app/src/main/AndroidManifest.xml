@@ -2,10 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.davit.redcarpet">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -30,7 +33,9 @@
         <activity android:name=".EditMyProfileActivity" />
         <activity android:name=".MyPartiesActivity" />
         <activity android:name=".EditMyPartyActivity" />
-        <activity android:name=".AgendaActivity"></activity>
+        <activity android:name=".AgendaActivity" />
+        <activity android:name=".FriendActivity" />
+        <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>

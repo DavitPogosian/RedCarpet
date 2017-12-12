@@ -56,7 +56,6 @@ public class PartyDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.party_details);
         party_pic=(CircleImageView) findViewById(R.id.party_img);
         setButonText();
-        setImages();
         Party_id = getIntent().getIntExtra("PartyID",-1);
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
         id = sp.getInt(user_id_sp, 0);
@@ -132,8 +131,8 @@ public class PartyDetailsActivity extends AppCompatActivity {
                 Rating.setRating(Float.valueOf(r));
 
                 Log.e(TAG,userimagefullUrlForimg);
-                // TODO: 11/12/2017 chi ashxatum useriimage , erb description@ kam addresshint@ null a tp cuyc chta TextViewner@ dizainel besamb vatna
-                // TODO: 11/12/2017 stanal sax frendner@ ovqer nshel en vor kgnan patyin  texadrel hoizontal i mej menak nkarner@ u poqr anunner@ takic , amen mi itemin kcneluc redirectia kani et mardu profile
+                // TODO: 11/12/2017 chi ashxatum useriimage , erb description@ kam addresshint@ null a tp cuyc chta TextViewner@
+                // TODO: 11/12/2017 (taza activityum sargel maket i tak dayle )  stanal sax frendner@ ovqer nshel en vor kgnan patyin  texadrel hoizontal i mej menak nkarner@ u poqr anunner@ takic , amen mi itemin kcneluc redirectia kani et mardu profile
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -148,11 +147,8 @@ public class PartyDetailsActivity extends AppCompatActivity {
         // chek out if current time > start time && current time < end time && status == checkin
         //gone if current time > end time
     }
-    public void setImages()
-    {
-        //// TODO: 11/19/2017 use picaso to downloade images
-    }
-    public void getating(View v)
+
+    public void getrating(View v)
     {
         RatingBar r = (RatingBar) findViewById(R.id.ratingBar);
         Log.e("this",""+r.getRating());
@@ -174,5 +170,12 @@ public class PartyDetailsActivity extends AppCompatActivity {
     private void gotoHome() {
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
+    }
+    public void goToChat(View view)
+    {
+        Intent go = new Intent(this, ChatActivity.class);
+        // TODO: 12/12/2017 Get party chat name and put in extre  
+        go.putExtra("room_name","public" );
+        startActivity(go);
     }
 }

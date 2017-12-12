@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity
                 .placeholder(R.drawable.prof_pic_def)
                 .error(R.drawable.prof_pic_def)
                 .into(pic);
+        // TODO: 11/12/2017  ALL permissions check 
 
         Parties = (ListView) findViewById(R.id.allpartylist);
         new GetAllParties().execute(new ApiConnector());
@@ -197,7 +198,13 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.agenda) {
             Intent go = new Intent(MainActivity.this, AgendaActivity.class);
             startActivity(go);
-
+        } else if (id == R.id.friend) {
+            Intent go = new Intent(MainActivity.this, FriendActivity.class);
+            startActivity(go);
+        } else if (id == R.id.chat) {
+            Intent go = new Intent(MainActivity.this, ChatActivity.class);
+            go.putExtra("room_name","public" );
+            startActivity(go);
         } else if (id == R.id.sing_out) {
             SharedPreferences.Editor ed = sp.edit();
             ed.putString(phonNumber_sp,"");

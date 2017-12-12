@@ -17,14 +17,56 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:id="@+id/scrollView2">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/back"
             tools:context="com.example.davit.redcarpet.AddPartyActivity">
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/org_img"
+                android:layout_marginTop="40dp">
+
+                <Button
+                    android:id="@+id/button5"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toStartOf="@+id/button2"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonback"
+                    android:text="Chat"
+                    android:textColor="@color/buttonText" />
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonback"
+                    android:text="Will go"
+                    android:textColor="@color/buttonText" />
+
+                <Button
+                    android:id="@+id/attendlist"
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_weight="1"
+                    android:background="@drawable/buttonback"
+                    android:text="see attend list"
+                    android:textColor="@color/buttonText" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/timestart"
@@ -183,43 +225,26 @@
                 android:isIndicator="true" />
 
 
-            <Button
+            <!--<Button-->
+                <!--android:id="@+id/button4"-->
+                <!--android:layout_width="100dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:layout_alignBaseline="@+id/button2"-->
+                <!--android:layout_alignBottom="@+id/button2"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:background="@drawable/buttonback"-->
+                <!--android:text="Will go"-->
+                <!--android:textColor="@color/buttonText" />-->
 
-                android:id="@+id/attendlist"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/org_img"
-                android:layout_marginTop="40dp"
-                android:background="@drawable/buttonback"
-                android:ems="20"
-                android:text="see Attend list"
-                android:textAlignment="center"
-                android:textColor="@color/buttonText"
-                android:textColorHint="@color/edittextText"
-
-                />
-
-            <Button
-                android:id="@+id/button4"
-                android:layout_width="100dp"
-                android:layout_height="40dp"
-                android:layout_alignBaseline="@+id/button2"
-                android:layout_alignBottom="@+id/button2"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/buttonback"
-                android:text="Will go"
-                android:textColor="@color/buttonText" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="100dp"
-                android:layout_height="40dp"
-                android:layout_alignTop="@+id/attendlist"
-                android:layout_toStartOf="@+id/button4"
-                android:background="@drawable/buttonback"
-                android:text="Chat"
-                android:textColor="@color/buttonText" />
+            <!--<Button-->
+                <!--android:id="@+id/button2"-->
+                <!--android:layout_width="100dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:layout_alignTop="@+id/attendlist"-->
+                <!--android:layout_toStartOf="@+id/button4"-->
+                <!--android:background="@drawable/buttonback"-->
+                <!--android:text="Chat"-->
+                <!--android:textColor="@color/buttonText" />-->
 
             <ImageView
                 android:id="@+id/imageView2"
@@ -234,6 +259,19 @@
                 android:visibility="gone"
                 app:srcCompat="@drawable/party_def_ic"
                 tools:ignore="OnClick" />
+
+            <!--<Button-->
+            <!--android:id="@+id/button4"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:layout_alignBaseline="@+id/button2"-->
+            <!--android:layout_alignBottom="@+id/button2"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:background="@drawable/buttonback"-->
+            <!--android:text="Will go"-->
+            <!--android:textColor="@color/buttonText" />-->
+
         </RelativeLayout>
     </ScrollView>
+
 </RelativeLayout>
