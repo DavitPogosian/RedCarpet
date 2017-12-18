@@ -25,6 +25,7 @@ public class PartyDetailsActivity extends AppCompatActivity {
     RatingBar ratingBar;
     CircleImageView party_pic;
     int Party_id;
+    String PartyImageName;
 
     private static final String TAG = "PartyDetailsActivity";
 
@@ -78,7 +79,6 @@ public class PartyDetailsActivity extends AppCompatActivity {
         PartyImage = (CircleImageView) findViewById(R.id.party_img);
         OrgImage = (CircleImageView) findViewById(R.id.org_img);
         Rating = (RatingBar) findViewById(R.id.ratingBar);
-        // TODO: 02/12/2017 get all info of party by id
         new PartyDetailsActivity.ShowPartyById().execute(new ApiConnector());
     }
 
@@ -109,10 +109,22 @@ public class PartyDetailsActivity extends AppCompatActivity {
                 StartTime.setText(jsonObject.getString("start"));
                 EndTime.setText(jsonObject.getString("end"));
                 Adress.setText(jsonObject.getString("andress"));
-                AdressHInt.setText(jsonObject.getString("adresshint"));
+                if(jsonObject.getString("adresshint").length()==0)
+                {
+                    AdressHInt.setVisibility(View.GONE);
+                }else{
+                    AdressHInt.setText(jsonObject.getString("adresshint"));
+                }
+                if(jsonObject.getString("description").length()==0)
+                {
+                    Description.setVisibility(View.GONE);
+                }else{
+                    Description.setText(jsonObject.getString("description"));
+                }
+
                 Description.setText(jsonObject.getString("description"));
-                String imageName=jsonObject.getString("image");
-                String fullUrlForimg=startImageUrl+imageName+".jpg";
+                PartyImageName=jsonObject.getString("image");
+                String fullUrlForimg=startImageUrl+PartyImageName+".jpg";
                 Picasso.with(getApplicationContext()).load(fullUrlForimg)
                         .placeholder(R.drawable.party_def_ic)
                         .error(R.drawable.party_def_ic)
@@ -131,7 +143,6 @@ public class PartyDetailsActivity extends AppCompatActivity {
                 Rating.setRating(Float.valueOf(r));
 
                 Log.e(TAG,userimagefullUrlForimg);
-                // TODO: 11/12/2017 chi ashxatum useriimage , erb description@ kam addresshint@ null a tp cuyc chta TextViewner@
                 // TODO: 11/12/2017 (taza activityum sargel maket i tak dayle )  stanal sax frendner@ ovqer nshel en vor kgnan patyin  texadrel hoizontal i mej menak nkarner@ u poqr anunner@ takic , amen mi itemin kcneluc redirectia kani et mardu profile
 
             } catch (JSONException e) {
@@ -174,8 +185,7 @@ public class PartyDetailsActivity extends AppCompatActivity {
     public void goToChat(View view)
     {
         Intent go = new Intent(this, ChatActivity.class);
-        // TODO: 12/12/2017 Get party chat name and put in extre  
-        go.putExtra("room_name","public" );
+        go.putExtra("room_name",PartyImageName );
         startActivity(go);
     }
 }

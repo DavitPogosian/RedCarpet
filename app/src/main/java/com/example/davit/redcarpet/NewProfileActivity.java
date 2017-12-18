@@ -71,7 +71,6 @@ public class NewProfileActivity extends AppCompatActivity {
         setContentView(R.layout.new_profile);
 
         setNumber();
-        // TODO: 11/20/2017 heto sax petqa poxes nenc vor hamarn taza petqa qcvi db , qceluc heto idn staci u hamarn u idn qci sp-i mej
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
 //        Number=sp.getString(phonNumber_sp,"");
 //        id=sp.getInt(user_id_sp,0);
@@ -79,7 +78,6 @@ public class NewProfileActivity extends AppCompatActivity {
 //        {
 //            gotomain();
 //        }
-        //todo save aneluc heto ete amen inch chotki a het tar main  manu
 
         Name = (EditText) findViewById(R.id.name);
         Adress = (EditText) findViewById(R.id.adress);
@@ -105,7 +103,6 @@ public class NewProfileActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, e.toString());
             }
-
         }
     }
     public boolean checkpermission()

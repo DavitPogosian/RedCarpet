@@ -70,7 +70,6 @@ public class AddPartyActivity extends AppCompatActivity {
 
 
     // TODO: 12/12/2017 add animation while user will white , finish animation before goHOme()
-    // TODO: 12/12/2017 the user can not have 2 or more parties with the same name
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

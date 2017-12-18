@@ -43,7 +43,9 @@
                     android:layout_weight="1"
                     android:background="@drawable/buttonback"
                     android:text="Chat"
-                    android:textColor="@color/buttonText" />
+                    android:textColor="@color/buttonText"
+                    android:onClick="goToChat"
+                    tools:ignore="OnClick" />
 
                 <Button
                     android:id="@+id/button2"

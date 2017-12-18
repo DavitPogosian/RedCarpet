@@ -710,6 +710,57 @@ public class ApiConnector {
 
         return jsonArray;
     }
+    public JSONArray GetUserByNumber(String number)
+    {
+
+        String url = baseurl+"GetUserByNumber.php";
+        HttpEntity httpEntity = null;
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(url);
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
+        nameValuePair.add(new BasicNameValuePair("number", number));
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            Log.e("UnsupportedEncoding",e.toString());
+        }
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            // write response to log
+            Log.d("Http Post Response:", httpResponse.toString());
+            httpEntity = httpResponse.getEntity();
+        } catch (ClientProtocolException e) {
+            Log.e("ClientProtocolException",e.toString());
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.e("IOException",e.toString());
+            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e("Exception",e.toString());
+            e.printStackTrace();
+        }
+        JSONArray jsonArray = null;
+
+        if (httpEntity != null) {
+            try {
+                String entityResponse = EntityUtils.toString(httpEntity);
+
+                Log.d("Entity Response  : ", entityResponse);
+
+                jsonArray = new JSONArray(entityResponse);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("JSONException",e.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("IOException",e.toString());
+            }
+        }
+
+        return jsonArray;
+    }
 
     public String EditParty(String name, String date , String start, String end, String andress, String adresshint, String description, String user_id,String image, int id ) {
         // Party(name, date, start, end, andress, adresshint, description, user_id, image)

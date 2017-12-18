@@ -80,10 +80,8 @@ public class MainActivity extends AppCompatActivity
             Log.e("number leght", "" + user_number.length());
             showDialog(1);
             //// TODO: 11/19/2017 test login
-        } else if (id == 0) {
-            //// TODO: 11/19/2017 downloade id and set in sp
-        } else if (user_name.length() == 0) {
-            //// TODO: 11/19/2017 downloade user_name and set in sp
+        } else if (id == 0 || user_name.length() == 0) {
+            new MainActivity.GetUserByNumber().execute(new ApiConnector());
         }
 
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
@@ -97,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                 .placeholder(R.drawable.prof_pic_def)
                 .error(R.drawable.prof_pic_def)
                 .into(pic);
-        // TODO: 11/12/2017  ALL permissions check 
+        // TODO: 11/12/2017  ALL permissions check
 
         Parties = (ListView) findViewById(R.id.allpartylist);
         new GetAllParties().execute(new ApiConnector());
@@ -117,6 +115,40 @@ public class MainActivity extends AppCompatActivity
 
 
         });
+    }
+    private class GetUserByNumber extends AsyncTask<ApiConnector,Long,JSONArray>
+    {
+        @Override
+        protected JSONArray doInBackground(ApiConnector... params) {
+            return params[0].GetUserByNumber(user_number);
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) {
+            SetUserInformation(jsonArray);
+        }
+    }
+    public void SetUserInformation(JSONArray jsonArray)
+    {
+        try {
+
+            //`id`, `number`, `name`, `adress`, `info`, `image`
+            JSONObject jsonObject = jsonArray.getJSONObject(0);//or 0
+
+            SharedPreferences.Editor ed = sp.edit();
+            ed.putInt(user_id_sp,Integer.valueOf(jsonObject.getString("id")));
+            ed.putString(user_name_sp,jsonObject.getString("name"));
+            if(!ed.commit())
+            {
+                Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
+            }else
+            {
+                finish();
+                startActivity(getIntent());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
