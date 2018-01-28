@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context="com.example.davit.redcarpet.activity.EditMyPartyActivity"
+
+
+    >
+
+
+
+    <DatePicker
+            android:id="@+id/date_picker"
+            android:layout_width="match_parent"
+            android:calendarViewShown="false"
+            android:spinnersShown="true"
+            android:layout_weight="4"
+            android:layout_height="0dp"
+        />
+
+        <TimePicker
+            android:id="@+id/time_picker"
+            android:layout_weight="4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/txtNewText"
+            android:text="Confirm"
+            android:textAlignment="center"></Button>
+
+    </LinearLayout>
+
