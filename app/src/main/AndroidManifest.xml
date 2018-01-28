@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
@@ -26,16 +26,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddPartyActivity" />
-        <activity android:name=".PartyDetailsActivity" />
-        <activity android:name=".NewProfileActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".EditMyProfileActivity" />
-        <activity android:name=".MyPartiesActivity" />
-        <activity android:name=".EditMyPartyActivity" />
-        <activity android:name=".AgendaActivity" />
-        <activity android:name=".FriendActivity" />
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".activity.AddPartyActivity" />
+        <activity android:name=".activity.PartyDetailsActivity" />
+        <activity android:name=".activity.NewProfileActivity" />
+        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.EditMyProfileActivity" />
+        <activity android:name=".activity.MyPartiesActivity" />
+        <activity android:name=".activity.EditMyPartyActivity" />
+        <activity android:name=".activity.AgendaActivity" />
+        <activity android:name=".activity.FriendActivity" />
+        <activity android:name=".activity.ChatActivity" />
+        <activity android:name=".activity.ViewProfileActivity" />
+        <activity android:name=".activity.AttendeeActivity" />
     </application>
 
 </manifest>

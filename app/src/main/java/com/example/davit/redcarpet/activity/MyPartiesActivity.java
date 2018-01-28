@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.PartiesAdapter;
+import com.example.davit.redcarpet.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

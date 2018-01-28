@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +19,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
 import com.squareup.picasso.Picasso;
 
 import org.apache.http.NameValuePair;
@@ -93,7 +96,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
             JSONObject jsonObject = jsonArray.getJSONObject(0);//or 0
             Adress.setText(jsonObject.getString("adress"));
             Info.setText(jsonObject.getString("info"));
-            String url = "https://redcarpetproject.000webhostapp.com/images/" + Number + ".jpg";
+            String url = Tools.IMAGES_URL + Number + ".jpg";
             Log.e("url", url);
             Picasso.with(this).load(url)
                     .placeholder(R.drawable.prof_pic_def)
@@ -151,12 +154,12 @@ public class EditMyProfileActivity extends AppCompatActivity {
     }
     private class EditProfile extends AsyncTask<ApiConnector, Long, String>
     {
-        String NEWnameForsp= Name.getText().toString();
         String adres=Adress.getText().toString();
         String info=Info.getText().toString();
         @Override
         protected String doInBackground(ApiConnector... params)
         {
+            NEWnameForsp = Name.getText().toString();
             if(img_is_set)
                 return params[0].EditProfile(id,Number,NEWnameForsp, adres, info, Number);
 
@@ -175,6 +178,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
                         uploadImg();
                     else
                         gotohome(null);
+                    Toast.makeText(getApplicationContext(), "Profile updated", Toast.LENGTH_LONG).show();
                 }else
                 {
                     Log.e(TAG,Result);

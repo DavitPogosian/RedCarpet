@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -7,7 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class LoginActivity extends AppCompatActivity {
 
 
@@ -29,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView error;
     Button button;
     int rando;
+    String originNumber;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         code = (EditText) findViewById(R.id.code);
         error = (TextView) findViewById(R.id.error);
         button = (Button) findViewById(R.id.button7);
-
+        phone.setText(Tools.getNumber(this));
     }
 
 
@@ -53,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (IdInDataBase()) {
                     error.setVisibility(View.GONE);
                     checkMyPermission();
+                    originNumber=Number;
                     sendSMS(Number, rando);
                     code.setVisibility(View.VISIBLE);
                     button.setText("VERIFY");
@@ -67,15 +79,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         else
         {
-            String Code = code.getText().toString();
-            if(Code.equals(String.valueOf(rando)))
-            {
-                Toast.makeText(getBaseContext(), "Successfully verified", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                Toast.makeText(getBaseContext(), "Incorrect code", Toast.LENGTH_SHORT).show();
-            }
+           checkSMS();
         }
     }
     public boolean IdInDataBase()
@@ -108,15 +112,6 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
 
-
-
-
-
-
-
-
-
-
         }
         else {
             Log.v("Permission","Permissions are granted");
@@ -127,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void sendSMS(String phoneNumber, int message)
+    private void sendSMS(final String phoneNumber, int message)
     {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
@@ -201,13 +196,87 @@ public class LoginActivity extends AppCompatActivity {
                 SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
                 String origNumber = msg.getOriginatingAddress();
                 String msgBody = msg.getMessageBody();
+                code.setText(msgBody);
+                checkSMS();
                 // Now one can just match the msgBody with the expected
                 // confirmation code for example.
             }
         }, intentFilter);
 
+        new AsyncTask<ApiConnector, Long, JSONObject>() {
+            @Override
+            protected JSONObject doInBackground(ApiConnector... apiConnectors) {
+                return apiConnectors[0].sendSMS(originNumber);
+            }
+            @Override
+            protected void onPostExecute(JSONObject object)
+            {
+                boolean result = false;
+                try {
+                    result = object.getBoolean("success");
+                    if (result) {
+                        Toast.makeText(getBaseContext(), "SMS sent", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getBaseContext(), "SMS send failed", Toast.LENGTH_SHORT).show();
+            }
+
+        }.execute(new ApiConnector());
+        /*
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, String.valueOf(message), sentPI, deliveredPI);
+        */
+
+    }
+
+    private void checkSMS() {
+        final String codeReceived = code.getText().toString();
+        new AsyncTask<ApiConnector, Long, JSONObject>() {
+            @Override
+            protected JSONObject doInBackground(ApiConnector... apiConnectors) {
+                return apiConnectors[0].checkSMS(originNumber, codeReceived);
+            }
+            @Override
+            protected void onPostExecute(JSONObject object)
+            {
+                boolean result = false;
+                try {
+                    result = object.getBoolean("success");
+                    if (result) {
+                        JSONObject user = object.getJSONObject("user");
+                        setResult(200);
+                        registerLogin(originNumber, user.getInt("id"),user.getString("number"), user.getString("name"), object.getString("token"));
+                        Toast.makeText(getBaseContext(), "Successfully verified", Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getBaseContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+            }
+
+        }.execute(new ApiConnector());
+
+
+    }
+
+
+    private int registerLogin(String originNumber, int id, String number, String name, String token) {
+        SharedPreferences sp = getSharedPreferences(MainActivity.sp_Name, MODE_PRIVATE);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putInt(MainActivity.user_id_sp, id);
+        ed.putString(MainActivity.phonNumber_sp, number);
+        ed.putString(MainActivity.user_name_sp, name);
+        ed.putString(MainActivity.token, token);
+        Tools.setCurrentToken(token);
+        Tools.setCurrentId(id);
+        Tools.validateToken();
+        ed.commit();
+        return 10;
     }
 
 }

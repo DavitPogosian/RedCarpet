@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.davit.redcarpet.NewProfileActivity"
+    tools:context="com.example.davit.redcarpet.activity.NewProfileActivity"
     android:background="@drawable/back">
 
 
@@ -44,17 +44,17 @@
         />
 
     <TextView
+        android:id="@+id/phon"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Phon Number"
-        android:textSize="29dp"
-        android:ems="10"
         android:layout_below="@+id/name"
         android:layout_marginTop="30dp"
-        android:id="@+id/phon"
         android:background="@drawable/edittextback"
+        android:ems="10"
+        android:text="Phon Number"
+        android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:textAlignment="center" />
+        android:textSize="29dp" />
 
     <EditText
         android:layout_width="match_parent"

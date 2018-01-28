@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.davit.redcarpet.AddPartyActivity"
+    tools:context="com.example.davit.redcarpet.activity.AddPartyActivity"
     android:background="@drawable/back">
 
     <EditText
@@ -20,13 +20,15 @@
         android:layout_alignTop="@+id/party_img"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="14dp"
-        android:id="@+id/date"
+        android:id="@+id/startDate"
         android:background="@drawable/edittextback"
         android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:hint="Date"
+        android:hint="Start Date"
         android:textColorHint="@color/edittextText"
         android:imeOptions="actionDone"
+        android:clickable="true"
+        android:onClick="pickStartDate"
         />
 
     <EditText
@@ -34,39 +36,25 @@
         android:layout_height="25dp"
         android:inputType="time"
         android:ems="10"
-        android:layout_marginTop="15dp"
-        android:id="@+id/timestart"
-        android:background="@drawable/edittextback"
-        android:layout_below="@+id/date"
-        android:layout_alignStart="@+id/date"
-        android:textAlignment="center"
-        android:textColor="@color/edittextText"
-        android:hint="Start time"
-        android:textColorHint="@color/edittextText"
-        android:imeOptions="actionDone"
-        />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:inputType="time"
-        android:ems="10"
-        android:id="@+id/timeend"
+        android:id="@+id/endDate"
         android:background="@drawable/edittextback"
         android:layout_alignBottom="@+id/party_img"
-        android:layout_alignStart="@+id/timestart"
+        android:layout_alignStart="@+id/startDate"
         android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:hint="End time"
+        android:hint="End date"
         android:textColorHint="@color/edittextText"
         android:imeOptions="actionDone"
+        android:clickable="true"
+        android:onClick="pickEndDate"
+
         />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:inputType="textPersonName"
-        android:hint="Adress here"
+        android:hint="Address here"
         android:ems="20"
         android:layout_marginTop="40dp"
         android:id="@+id/adress_of"

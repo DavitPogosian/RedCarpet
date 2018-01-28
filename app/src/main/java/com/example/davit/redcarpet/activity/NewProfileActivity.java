@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -23,6 +23,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.R;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -185,7 +188,9 @@ public class NewProfileActivity extends AppCompatActivity {
             return false;
         }
         id=Integer.parseInt(Result);
+        /*
         SharedPreferences.Editor ed = sp.edit();
+
         ed.putString(phonNumber_sp,Number);
         ed.putInt(user_id_sp,id);
         ed.putString(user_name_sp,nameForsp);
@@ -193,7 +198,8 @@ public class NewProfileActivity extends AppCompatActivity {
         {
             Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
         }
-
+        */
+        Toast.makeText(getApplicationContext(),"Successfully registed, you may login now",Toast.LENGTH_SHORT).show();
 
      return true;
     }

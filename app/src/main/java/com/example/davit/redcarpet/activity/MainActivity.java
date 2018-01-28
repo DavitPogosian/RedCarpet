@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -22,6 +22,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.PartiesAdapter;
+import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -46,17 +50,17 @@ public class MainActivity extends AppCompatActivity
     CircleImageView pic;
 
     SharedPreferences sp;
-    private static final String sp_Name = "userinfo";
-    private static final String phonNumber_sp = "Number";
-    private static final String user_id_sp = "ID";
-    private static final String user_name_sp = "Name";
+    public static final String sp_Name = "userinfo";
+    public static final String phonNumber_sp = "Number";
+    public static final String user_id_sp = "ID";
+    public static final String user_name_sp = "Name";
+    public static final String token = "Token";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -68,6 +72,9 @@ public class MainActivity extends AppCompatActivity
         id = sp.getInt(user_id_sp, 0);
         user_number = sp.getString(phonNumber_sp, "");
         user_name = sp.getString(user_name_sp, "");
+        Tools.setCurrentId(id);
+        Tools.setCurrentToken(sp.getString(token, ""));
+
 
 //        SharedPreferences.Editor ed = sp.edit();
 //        ed.putString(phonNumber_sp, "0488443770");
@@ -76,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 //        ed.commit();
 
 
-        if (user_number.length() == 0) {
+        if (user_number.length() == 0 || !Tools.tokenIsValid()) {
             Log.e("number leght", "" + user_number.length());
             showDialog(1);
             //// TODO: 11/19/2017 test login
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         nav_usr_name = (TextView) hView.findViewById(R.id.name);
         nav_usr_name.setText(user_name);
         pic = (CircleImageView) hView.findViewById(R.id.prof_pic);
-        String url = "https://redcarpetproject.000webhostapp.com/images/" + user_number + ".jpg";
+        String url = Tools.IMAGES_URL + user_number + ".jpg";
         Log.e("url", url);
         Picasso.with(this).load(url)
                 .placeholder(R.drawable.prof_pic_def)
@@ -106,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 
                     JSONObject productClicked = jsonArray.getJSONObject(position);
                     Intent showDetails = new Intent(getApplicationContext(), PartyDetailsActivity.class);
-                    showDetails.putExtra("PartyID", productClicked.getInt("Id"));
+                    showDetails.putExtra("PartyID", productClicked.getInt("id"));
                     startActivity(showDetails);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -153,6 +160,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -177,6 +185,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            gotoEditProfile();
             return true;
         }
 
@@ -223,7 +232,8 @@ public class MainActivity extends AppCompatActivity
             Intent go = new Intent(MainActivity.this, AddPartyActivity.class);
             startActivity(go);
         } else if (id == R.id.settings) {
-
+            Intent go = new Intent(MainActivity.this, EditMyProfileActivity.class);
+            startActivity(go);
         } else if (id == R.id.my_party) {
             Intent go = new Intent(MainActivity.this, MyPartiesActivity.class);
             startActivity(go);
@@ -258,8 +268,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    public void gotoEditProfile(View v)
+    public void gotoEditProfile()
     {
         Intent go = new Intent(this,EditMyProfileActivity.class);
         startActivity(go);
@@ -280,6 +289,9 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
+            if (jsonArray==null) {
+                Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
+            }
             setListAdapter(jsonArray);
 
 

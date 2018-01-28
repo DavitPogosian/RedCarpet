@@ -1,4 +1,4 @@
-package com.example.davit.redcarpet;
+package com.example.davit.redcarpet.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,16 +7,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.davit.redcarpet.ApiConnector;
+import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -36,13 +43,13 @@ public class PartyDetailsActivity extends AppCompatActivity {
     private static final String user_name_sp = "Name";
 
     int id;
+    int orgId;
     String user_number;
     String user_name;
 
     TextView Name;
-    TextView Date;
-    TextView StartTime;
-    TextView EndTime;
+    TextView startDate;
+    TextView endDate;
     TextView Adress;
     TextView AdressHInt;
     TextView Description;
@@ -50,13 +57,13 @@ public class PartyDetailsActivity extends AppCompatActivity {
     CircleImageView PartyImage;
     CircleImageView OrgImage;
     RatingBar Rating;
+    Button goButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.party_details);
         party_pic=(CircleImageView) findViewById(R.id.party_img);
-        setButonText();
         Party_id = getIntent().getIntExtra("PartyID",-1);
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
         id = sp.getInt(user_id_sp, 0);
@@ -70,15 +77,15 @@ public class PartyDetailsActivity extends AppCompatActivity {
 
         Name = (TextView) findViewById(R.id.Name);
         OrgName = (TextView) findViewById(R.id.org_name);
-        Date = (TextView) findViewById(R.id.date);
-        StartTime = (TextView) findViewById(R.id.timestart);
-        EndTime = (TextView) findViewById(R.id.timeend);
+        startDate = (TextView) findViewById(R.id.startDate);
+        endDate = (TextView) findViewById(R.id.endDate);
         Adress = (TextView) findViewById(R.id.adress_of);
         AdressHInt = (TextView) findViewById(R.id.adress_hint);
         Description = (TextView) findViewById(R.id.description);
         PartyImage = (CircleImageView) findViewById(R.id.party_img);
         OrgImage = (CircleImageView) findViewById(R.id.org_img);
         Rating = (RatingBar) findViewById(R.id.ratingBar);
+        goButton = (Button) findViewById(R.id.buttonGo);
         new PartyDetailsActivity.ShowPartyById().execute(new ApiConnector());
     }
 
@@ -86,7 +93,7 @@ public class PartyDetailsActivity extends AppCompatActivity {
 
     private class ShowPartyById extends AsyncTask<ApiConnector, Long, JSONArray>
     {
-        private static final String  startImageUrl="https://redcarpetproject.000webhostapp.com/images/";
+        private static final String  startImageUrl= Tools.IMAGES_URL;
 
         @Override
         protected JSONArray doInBackground(ApiConnector... params)
@@ -101,13 +108,12 @@ public class PartyDetailsActivity extends AppCompatActivity {
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
 
                 /*
-                [{"name":"second ","date":"7.11.2017","start":"11:11","end":"11:11","andress":"my addres ","adresshint":"","description":
+                [{"name":"second ","startDate":"2017-11-01 11:11","endDate":"2017-11-01 11:11","andress":"my addres ","adresshint":"","description":
                 "","user_id":"4","image":"0488443770_second ","userimage":"def","username":"Davit","AVG(Reiting.rate)":null}]
                 * */
                 Name.setText(jsonObject.getString("name"));
-                Date .setText(jsonObject.getString("date"));
-                StartTime.setText(jsonObject.getString("start"));
-                EndTime.setText(jsonObject.getString("end"));
+                startDate.setText(Tools.formatDate(jsonObject.getString("startDate")));
+                endDate.setText(Tools.formatDate(jsonObject.getString("endDate")));
                 Adress.setText(jsonObject.getString("andress"));
                 if(jsonObject.getString("adresshint").length()==0)
                 {
@@ -130,6 +136,7 @@ public class PartyDetailsActivity extends AppCompatActivity {
                         .error(R.drawable.party_def_ic)
                         .into(PartyImage);
                 Log.e(TAG,jsonObject.getString("userimage"));
+                orgId  = jsonObject.getInt("user_id");
                 String userimageName=jsonObject.getString("userimage");
                 String userimagefullUrlForimg=startImageUrl+userimageName+".jpg";
                 Picasso.with(getApplicationContext()).load(userimagefullUrlForimg)
@@ -143,6 +150,8 @@ public class PartyDetailsActivity extends AppCompatActivity {
                 Rating.setRating(Float.valueOf(r));
 
                 Log.e(TAG,userimagefullUrlForimg);
+
+                setButonText();
                 // TODO: 11/12/2017 (taza activityum sargel maket i tak dayle )  stanal sax frendner@ ovqer nshel en vor kgnan patyin  texadrel hoizontal i mej menak nkarner@ u poqr anunner@ takic , amen mi itemin kcneluc redirectia kani et mardu profile
 
             } catch (JSONException e) {
@@ -153,10 +162,21 @@ public class PartyDetailsActivity extends AppCompatActivity {
     }
     public void setButonText()
     {
-        // will go if curent time <start time
-        // chekin if current time > start time && current time < end time && status != checkin
-        // chek out if current time > start time && current time < end time && status == checkin
-        //gone if current time > end time
+        Calendar currentDate = Calendar.getInstance();
+        Calendar eventDate= Tools.getDateFrom(startDate.getText().toString());
+        Calendar endDateTime = Tools.getDateFrom(endDate.getText().toString());
+        //startDate eventDate = new startDate();
+        if (currentDate.before(eventDate)) {
+            goButton.setText("Will go");
+        } else {
+            if (currentDate.before(endDateTime)) {
+                // chekin if current time > start time && current time < end time && status != checkin
+                // chek out if current time > start time && current time < end time && status == checkin
+                goButton.setText("Check in");
+            } else {
+                goButton.setText("Gone");
+            }
+        }
     }
 
     public void getrating(View v)
@@ -178,6 +198,13 @@ public class PartyDetailsActivity extends AppCompatActivity {
         ImageView imageView = (ImageView) findViewById(R.id.imageView2);
         imageView.setVisibility(View.GONE);
     }
+
+    public void goToOrgActivity(View view) {
+        Intent intent = new Intent(this,ViewProfileActivity.class);
+        intent.putExtra("org_id",orgId );
+        startActivity(intent);
+
+    }
     private void gotoHome() {
         Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
@@ -188,4 +215,28 @@ public class PartyDetailsActivity extends AppCompatActivity {
         go.putExtra("room_name",PartyImageName );
         startActivity(go);
     }
+    public void showAttendees(View view) {
+        Intent go = new Intent(this, AttendeeActivity.class);
+        go.putExtra("PartyID",Party_id);
+        startActivity(go);
+    }
+
+    public void registerAttend(View view) {
+        new AsyncTask<ApiConnector, Long, Boolean>() {
+            @Override
+            protected Boolean doInBackground(ApiConnector... apiConnectors) {
+                return apiConnectors[0].attend(Party_id);
+            }
+            @Override
+            protected void onPostExecute(Boolean registred)
+            {
+                if (registred) {
+                    Toast.makeText(getBaseContext(), "Successfully registred to the party", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(getBaseContext(), "Unable to register to party", Toast.LENGTH_SHORT).show();
+            }
+
+        }.execute(new ApiConnector());
+    }
+
 }

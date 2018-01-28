@@ -2,15 +2,10 @@ package com.example.davit.redcarpet;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -19,16 +14,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Davit on 02/12/2017.
  */
 public class PartiesAdapter extends BaseAdapter {
-    private static final String  startImageUrl="https://redcarpetproject.000webhostapp.com/images/";
+    private static final String  startImageUrl=Tools.IMAGES_URL;
     private JSONArray dataArray;
     private Activity activity;
     public static LayoutInflater inflater = null;
@@ -61,12 +53,12 @@ public class PartiesAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ListParty party;
+        final Party party;
 
         if(convertView == null)
         {
             convertView=inflater.inflate(R.layout.party_item,null);
-            party = new ListParty();
+            party = new Party();
             party.name=(TextView) convertView.findViewById(R.id.Name);
             party.adress=(TextView) convertView.findViewById(R.id.adress);
             party.End=(TextView) convertView.findViewById(R.id.End);
@@ -77,7 +69,7 @@ public class PartiesAdapter extends BaseAdapter {
         }
         else
         {
-            party= (ListParty) convertView.getTag();
+            party= (Party) convertView.getTag();
 
         }
         try {
@@ -85,8 +77,8 @@ public class PartiesAdapter extends BaseAdapter {
             JSONObject jsonObject = this.dataArray.getJSONObject(position);
             party.name.setText(jsonObject.getString("name"));
             party.adress.setText(jsonObject.getString("andress"));
-            party.End.setText(jsonObject.getString("end"));
-            party.Start.setText(jsonObject.getString("start"));
+            party.End.setText(Tools.formatDate(jsonObject.getString("endDate")));
+            party.Start.setText(Tools.formatDate(jsonObject.getString("startDate")));
             String imageName=jsonObject.getString("image");
             String fullUrlForimg=startImageUrl+imageName+".jpg";
             Picasso.with(activity).load(fullUrlForimg)
@@ -99,7 +91,7 @@ public class PartiesAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private class ListParty
+    private class Party
     {
 
         private TextView name;

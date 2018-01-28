@@ -4,6 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.davit.redcarpet.AgendaActivity">
-
+    tools:context="com.example.davit.redcarpet.activity.AgendaActivity"
+    android:background="@drawable/back">
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/nextPartylist" />
 </android.support.constraint.ConstraintLayout>

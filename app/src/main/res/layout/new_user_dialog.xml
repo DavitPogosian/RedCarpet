@@ -16,7 +16,7 @@
         android:layout_marginEnd="21dp" />
 
     <TextView
-        android:text="Wlcom to RedCarpet"
+        android:text="Welcome to RedCarpet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"

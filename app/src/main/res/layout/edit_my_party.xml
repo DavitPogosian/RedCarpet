@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.davit.redcarpet.EditMyPartyActivity"
+    tools:context="com.example.davit.redcarpet.activity.EditMyPartyActivity"
     android:background="@drawable/back">
 
     <EditText
@@ -20,13 +20,15 @@
         android:layout_alignTop="@+id/party_img"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="14dp"
-        android:id="@+id/date"
+        android:id="@+id/startDate"
         android:background="@drawable/edittextback"
         android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:hint="Date"
+        android:hint="Start Date"
         android:textColorHint="@color/edittextText"
         android:imeOptions="actionDone"
+        android:clickable="true"
+        android:onClick="pickStartDateTime"
         />
 
     <EditText
@@ -34,32 +36,18 @@
         android:layout_height="25dp"
         android:inputType="time"
         android:ems="10"
-        android:layout_marginTop="15dp"
-        android:id="@+id/timestart"
-        android:background="@drawable/edittextback"
-        android:layout_below="@+id/date"
-        android:layout_alignStart="@+id/date"
-        android:textAlignment="center"
-        android:textColor="@color/edittextText"
-        android:hint="Start time"
-        android:textColorHint="@color/edittextText"
-        android:imeOptions="actionDone"
-        />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:inputType="time"
-        android:ems="10"
-        android:id="@+id/timeend"
+        android:id="@+id/endDate"
         android:background="@drawable/edittextback"
         android:layout_alignBottom="@+id/party_img"
-        android:layout_alignStart="@+id/timestart"
+        android:layout_alignStart="@+id/startDate"
         android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:hint="End time"
+        android:hint="End Date"
         android:textColorHint="@color/edittextText"
         android:imeOptions="actionDone"
+        android:clickable="true"
+        android:onClick="pickEndDateTime"
+
         />
 
     <EditText
@@ -141,6 +129,7 @@
         android:hint="Name Here"
         android:textColorHint="@color/edittextText"/>
 
+
     <Button
         android:id="@+id/button3"
         android:layout_width="150dp"
@@ -156,11 +145,11 @@
         android:id="@+id/button4"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/timeend"
+        android:layout_alignEnd="@+id/endDate"
         android:layout_alignParentBottom="true"
         android:background="@drawable/buttonback"
         android:onClick="delete"
-        android:text="Dekete Party"
+        android:text="Delete Party"
         android:textColor="@color/buttonText" />
 
 </RelativeLayout>
