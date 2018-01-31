@@ -1,28 +1,40 @@
 package com.example.davit.redcarpet.activity;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
 import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
 import com.example.davit.redcarpet.UserAdapter;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class FriendActivity extends AppCompatActivity {
 
+    private static final String TAG = "FriendActivity";
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
 
     ListView friendsList;
@@ -36,6 +48,9 @@ public class FriendActivity extends AppCompatActivity {
     String user_number;
     String user_name;
     private Map<String, String> contactList;
+    private Dialog loading;
+
+    JSONArray registredUsersLists=new JSONArray();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,50 +67,88 @@ public class FriendActivity extends AppCompatActivity {
             finish();
         }
         contactList = getContactList();
+        if (contactList!=null)
+            new FriendActivity.CheckContact().execute(new ApiConnector());
+        friendsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
 
-        new FriendActivity.CheckContact().execute(new ApiConnector());
-
+                    JSONObject userClicked = registredUsersLists.getJSONObject(position);
+                    Intent showDetails = new Intent(getApplicationContext(), ViewProfileActivity.class);
+                    showDetails.putExtra("org_id", userClicked.getInt("id"));
+                    startActivity(showDetails);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}});
     }
 
 
     private void gotoHome() {
-        Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
+        finish();
     }
-    private Map<String, String> getContactList() {
-        Map<String, String> contactList = new HashMap();
-        ContentResolver cr = getContentResolver();
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
-
-        if ((cur != null ? cur.getCount() : 0) > 0) {
-            while (cur != null && cur.moveToNext()) {
-                String id = cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(
-                        ContactsContract.Contacts.DISPLAY_NAME));
-
-                if (cur.getInt(cur.getColumnIndex(
-                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                    Cursor pCur = cr.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{id}, null);
-                    while (pCur.moveToNext()) {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER))
-                                .toString().replaceAll(" ","");
-                        contactList.put(phoneNo, name);
-                        Log.i("tag", "Name: " + name);
-                        Log.i("tag", "Phone Number: " + phoneNo);
-                    }
-                    pCur.close();
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    contactList = getContactList();
+                    new FriendActivity.CheckContact().execute(new ApiConnector());
+                } else {
+                    Toast.makeText(getBaseContext(), "Allow access to your contacts so we can for registred friends.", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
+                break;
             }
         }
-        if(cur!=null){
-            cur.close();
+    }
+
+    private Map<String, String> getContactList() {
+        Map<String, String> contactList = new HashMap();
+        Boolean checkPermission = Tools.checkpermission(this, Manifest.permission.READ_CONTACTS, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        if (checkPermission==null)
+            return null;
+        else if (!checkPermission) {
+            Toast.makeText(getBaseContext(), "Permission denied to access your contact list.", Toast.LENGTH_SHORT).show();
+        } else {
+            loading = Tools.showLoading(this,"Checking for friends");
+            ContentResolver cr = getContentResolver();
+            Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                    null, null, null, null);
+
+            if ((cur != null ? cur.getCount() : 0) > 0) {
+                while (cur != null && cur.moveToNext()) {
+                    String id = cur.getString(
+                            cur.getColumnIndex(ContactsContract.Contacts._ID));
+                    String name = cur.getString(cur.getColumnIndex(
+                            ContactsContract.Contacts.DISPLAY_NAME));
+
+                    if (cur.getInt(cur.getColumnIndex(
+                            ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                        Cursor pCur = cr.query(
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                new String[]{id}, null);
+                        while (pCur.moveToNext()) {
+                            String phoneNo = pCur.getString(pCur.getColumnIndex(
+                                    ContactsContract.CommonDataKinds.Phone.NUMBER))
+                                    .toString().replaceAll(" ", "");
+                            if (phoneNo !=null && !"".equals(phoneNo.trim())) {
+                                contactList.put(phoneNo, name);
+                                //Log.i("tag", "Name: " + name);
+                                //Log.i("tag", "Phone Number: " + phoneNo);
+                            }
+                        }
+                        pCur.close();
+                    }
+                }
+            }
+            if (cur != null) {
+                cur.close();
+            }
         }
         Log.i("end", contactList.keySet().toString());
         return contactList;
@@ -103,6 +156,7 @@ public class FriendActivity extends AppCompatActivity {
 
     public void setListAdapter(JSONArray jsonArray)
     {
+        this.registredUsersLists=jsonArray;
         Log.d("JSON_object","jsonArray_setListAdapter= "+jsonArray);
         this.friendsList.setAdapter(new UserAdapter(jsonArray,this));
     }
@@ -115,13 +169,24 @@ public class FriendActivity extends AppCompatActivity {
                 friends.append(friend);
                 friends.append(",");
             }
+            Log.e("GetFriends", friends.toString());
             return apiConnectors[0].GetRegistredFriends(friends.toString());
         }
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
-            if (jsonArray==null)
-                Toast.makeText(getBaseContext(), "Unable to check friends. please try again later.", Toast.LENGTH_SHORT).show();
+            if (jsonArray==null) {
+                if (!Tools.tokenIsValid()) {
+                    Toast.makeText(getApplicationContext(), "You are disconnected", Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
+                    Toast.makeText(getBaseContext(), "Unable to check friends. please try again later.", Toast.LENGTH_SHORT).show();
+                }
+
+            }else if (jsonArray.length()==0) {
+                Toast.makeText(getBaseContext(), "No friends found, please invite them.", Toast.LENGTH_SHORT).show();
+            }
             setListAdapter(jsonArray);
+            loading.cancel();
         }
     }
 }

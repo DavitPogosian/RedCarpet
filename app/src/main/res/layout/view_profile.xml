@@ -78,7 +78,7 @@
         android:layout_alignParentEnd="true"
         android:background="@drawable/buttonback"
         android:onClick="addFriend"
-        android:text="add Friend"
+        android:text="add contact"
         android:textColor="@color/buttonText" />
 
     <Button

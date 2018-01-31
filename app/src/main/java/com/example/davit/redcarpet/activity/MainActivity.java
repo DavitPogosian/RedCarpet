@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     public static final String user_id_sp = "ID";
     public static final String user_name_sp = "Name";
     public static final String token = "Token";
+    private Dialog loading;
 
 
     @Override
@@ -63,8 +64,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
+        View hView = navView.getHeaderView(0);
+
+        nav_usr_name = (TextView) hView.findViewById(R.id.name);
+        pic = (CircleImageView) hView.findViewById(R.id.prof_pic);
+        Parties = (ListView) findViewById(R.id.allpartylist);
 
 
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
@@ -75,36 +81,33 @@ public class MainActivity extends AppCompatActivity
         Tools.setCurrentId(id);
         Tools.setCurrentToken(sp.getString(token, ""));
 
-
+//        Tools.setCurrentToken("0b7e575ac99c62d5fae2d5169eb9b88bcd41971c1ba60d06656ba5378597e5c5cd056c957c697d7f");
 //        SharedPreferences.Editor ed = sp.edit();
 //        ed.putString(phonNumber_sp, "0488443770");
 //        ed.putInt(user_id_sp, 4);
 //        ed.putString(user_name_sp, "Davited");
 //        ed.commit();
 
-
         if (user_number.length() == 0 || !Tools.tokenIsValid()) {
             Log.e("number leght", "" + user_number.length());
-            showDialog(1);
-            //// TODO: 11/19/2017 test login
-        } else if (id == 0 || user_name.length() == 0) {
+            showLogin();
+            return;
+        }
+    }
+
+    private void fillInfos() {
+        if (id == 0 || user_name.length() == 0) {
             new MainActivity.GetUserByNumber().execute(new ApiConnector());
         }
-
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
-        View hView = navigationView.getHeaderView(0);
-        nav_usr_name = (TextView) hView.findViewById(R.id.name);
         nav_usr_name.setText(user_name);
-        pic = (CircleImageView) hView.findViewById(R.id.prof_pic);
         String url = Tools.IMAGES_URL + user_number + ".jpg";
         Log.e("url", url);
         Picasso.with(this).load(url)
                 .placeholder(R.drawable.prof_pic_def)
                 .error(R.drawable.prof_pic_def)
                 .into(pic);
-        // TODO: 11/12/2017  ALL permissions check
 
-        Parties = (ListView) findViewById(R.id.allpartylist);
+        loading = Tools.showLoading(this, "Loading parties...");
         new GetAllParties().execute(new ApiConnector());
         this.Parties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -123,6 +126,28 @@ public class MainActivity extends AppCompatActivity
 
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
+
+        id = sp.getInt(user_id_sp, 0);
+        user_number = sp.getString(phonNumber_sp, "");
+        user_name = sp.getString(user_name_sp, "");
+        Tools.setCurrentId(id);
+        Tools.setCurrentToken(sp.getString(token, ""));
+        if (user_number.length() == 0 || !Tools.tokenIsValid()) {
+            Log.e("number leght", "" + user_number.length());
+            showLogin();
+        } else
+            fillInfos();
+
+    }
+    private void showLogin() {
+        showDialog(1);
+    }
+
     private class GetUserByNumber extends AsyncTask<ApiConnector,Long,JSONArray>
     {
         @Override
@@ -204,6 +229,7 @@ public class MainActivity extends AppCompatActivity
             adb.setPositiveButton("Sign up", myClickListener);
             adb.setNegativeButton("Log in", myClickListener);
             adb.setIcon(android.R.drawable.ic_dialog_info);
+            adb.setCancelable(false);
             return adb.create();
         } return super.onCreateDialog(id);
     }
@@ -228,7 +254,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.new_party) {
+        if (id == R.id.all_parties) {
+            new GetAllParties().execute(new ApiConnector());
+        } else if (id == R.id.new_party) {
             Intent go = new Intent(MainActivity.this, AddPartyActivity.class);
             startActivity(go);
         } else if (id == R.id.settings) {
@@ -252,6 +280,8 @@ public class MainActivity extends AppCompatActivity
             ed.putString(phonNumber_sp,"");
             ed.putInt(user_id_sp,0);
             ed.putString(user_name_sp,"");
+            ed.putString(token,"");
+            Tools.invalidateToken();
             if(!ed.commit())
             {
                 Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
@@ -289,8 +319,11 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
+            loading.dismiss();
             if (jsonArray==null) {
-                Toast.makeText(getApplicationContext(),"Something goes wrong : Please try again",Toast.LENGTH_SHORT).show();
+
+
+                Toast.makeText(getApplicationContext(),"Something goes wrong, please check you connection and try again",Toast.LENGTH_SHORT).show();
             }
             setListAdapter(jsonArray);
 

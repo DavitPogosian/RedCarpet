@@ -1,6 +1,5 @@
 package com.example.davit.redcarpet.activity;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,9 +15,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
@@ -147,19 +144,22 @@ public class EditMyPartyActivity extends AppCompatActivity {
         //protected void onPostExecute(JSONArray jsonArray)
         protected void onPostExecute(String jsonArray)
         {
+            if (!Tools.tokenIsValid()) {
+                Toast.makeText(getApplicationContext(), "You are disconnected", Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                try {
+                    String  Result=jsonArray;
+                    Log.d("Result","Result = "+Result);
+                    if(img_is_set)
+                        uploadImg();
+                    else gotoHome();
 
-            try {
-                String  Result=jsonArray;
-                Log.d("Result","Result = "+Result);
-                if(img_is_set)
-                    uploadImg();
-                else gotoHome();
-
-            } catch (Exception e) {
-                Log.d("Logul din error", "onPostExecute");
-                e.printStackTrace();
+                } catch (Exception e) {
+                    Log.d("Logul din error", "onPostExecute");
+                    e.printStackTrace();
+                }
             }
-
 
         }
 

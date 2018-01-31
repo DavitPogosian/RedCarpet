@@ -43,18 +43,18 @@
         android:imeOptions="actionDone"
         />
 
-    <TextView
-        android:id="@+id/phon"
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:text="Phon Number"
+        android:textSize="29dp"
+        android:ems="10"
         android:layout_below="@+id/name"
         android:layout_marginTop="30dp"
+        android:id="@+id/phon"
         android:background="@drawable/edittextback"
-        android:ems="10"
-        android:text="Phon Number"
-        android:textAlignment="center"
         android:textColor="@color/edittextText"
-        android:textSize="29dp" />
+        android:textAlignment="center" />
 
     <EditText
         android:layout_width="match_parent"

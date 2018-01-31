@@ -1,5 +1,6 @@
 package com.example.davit.redcarpet.activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -67,8 +68,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
     private static final int MAX_INFO_LENGHT = 200;
     private static final int SELECT_PICTURE = 1;
     private static final int ERROR_MESSAGE_MIN_LENGHT = 20;
-
-
+    private Dialog loading;
 
 
     @Override
@@ -82,7 +82,10 @@ public class EditMyProfileActivity extends AppCompatActivity {
         Info = (EditText) findViewById(R.id.info);
         PhonNumber = (TextView) findViewById(R.id.phon);
         ProfPic = (CircleImageView) findViewById(R.id.prof_pic);
-        new EditMyProfileActivity.GetUserByID().execute(new ApiConnector());    }
+        loading = Tools.showLoading(this, "Loading your profile...");
+        new EditMyProfileActivity.GetUserByID().execute(new ApiConnector());
+        // TODO checkbox allow other users to see my phone ?
+    }
 
 
     public void SetUserInformation(JSONArray jsonArray)
@@ -96,7 +99,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
             JSONObject jsonObject = jsonArray.getJSONObject(0);//or 0
             Adress.setText(jsonObject.getString("adress"));
             Info.setText(jsonObject.getString("info"));
-            String url = Tools.IMAGES_URL + Number + ".jpg";
+            String url = Tools.IMAGES_URL + jsonObject.getString("image") + ".jpg";
             Log.e("url", url);
             Picasso.with(this).load(url)
                     .placeholder(R.drawable.prof_pic_def)
@@ -122,8 +125,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
 
     public void gotohome(View v)
     {
-        Intent go = new Intent(this, MainActivity.class);
-        startActivity(go);
+        finish();
     }
 
     private class GetUserByID extends AsyncTask<ApiConnector,Long,JSONArray>
@@ -135,7 +137,9 @@ public class EditMyProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
-            SetUserInformation(jsonArray);
+            loading.dismiss();
+            if (jsonArray!=null)
+                SetUserInformation(jsonArray);
 
 
         }
@@ -149,6 +153,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
     {
         if(validation())
         {
+            loading=Tools.showLoading(this,"Updating your profile...");
             new EditMyProfileActivity.EditProfile().execute(new ApiConnector());
         }
     }
@@ -160,33 +165,38 @@ public class EditMyProfileActivity extends AppCompatActivity {
         protected String doInBackground(ApiConnector... params)
         {
             NEWnameForsp = Name.getText().toString();
-            if(img_is_set)
-                return params[0].EditProfile(id,Number,NEWnameForsp, adres, info, Number);
+                if(img_is_set)
+                    return params[0].EditProfile(id,Number,NEWnameForsp, adres, info, Number);
 
-            return params[0].EditProfile(id,Number,NEWnameForsp, adres, info,"def");
+                return params[0].EditProfile(id,Number,NEWnameForsp, adres, info,"def");
         }
 
         @Override
         //protected void onPostExecute(JSONArray jsonArray)
         protected void onPostExecute(String Result)
         {
-            try {
-                Log.d(TAG,"Result = "+Result);
-                if(success(Result)) {
+            loading.dismiss();
+            if (!Tools.tokenIsValid()) {
+                Toast.makeText(getApplicationContext(), "You are disconnected", Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                try {
+                    Log.d(TAG, "Result = " + Result);
+                    if (success(Result)) {
 
-                    if (img_is_set)
-                        uploadImg();
-                    else
-                        gotohome(null);
-                    Toast.makeText(getApplicationContext(), "Profile updated", Toast.LENGTH_LONG).show();
-                }else
-                {
-                    Log.e(TAG,Result);
-                    Toast.makeText(getApplicationContext(), "Something goes wrong : Please try again", Toast.LENGTH_LONG).show();
+                        if (img_is_set)
+                            uploadImg();
+                        else
+                            gotohome(null);
+                        Toast.makeText(getApplicationContext(), "Profile updated", Toast.LENGTH_LONG).show();
+                    } else {
+                        Log.e(TAG, Result);
+                        Toast.makeText(getApplicationContext(), "Something goes wrong : Please try again", Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "onPostExecute" + e);
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                Log.d(TAG, "onPostExecute"+e);
-                e.printStackTrace();
             }
         }
 

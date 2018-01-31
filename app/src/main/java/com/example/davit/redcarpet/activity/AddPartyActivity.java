@@ -34,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,6 @@ public class AddPartyActivity extends AppCompatActivity {
     private static final  String sp_Name="userinfo";
 
 
-    // TODO: 12/12/2017 add animation while user will white , finish animation before goHOme()
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +91,10 @@ public class AddPartyActivity extends AppCompatActivity {
 
     public void setDate()
     {
-        StartDate.setText(Tools.formatDate(Calendar.getInstance()));
+        Calendar now = Calendar.getInstance();
+        StartDate.setText(Tools.formatDate(now));
+        now.add(Calendar.HOUR,4);
+        EndDate.setText(Tools.formatDate(now));
     }
 
     public void add(View view)
@@ -137,11 +138,21 @@ public class AddPartyActivity extends AppCompatActivity {
         {
 
             try {
-               String  Result=jsonArray;
-                Log.d("Result","Result = "+Result);
-                if(img_is_set)
-                uploadImg();
-                createChatRoom();
+                if (jsonArray==null) {
+                    if (!Tools.tokenIsValid()) {
+                        Toast.makeText(getApplicationContext(), "You are disconnected", Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Error occurred while getting party detail, try again later", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    String Result = jsonArray;
+                    Log.d("Result", "Result = " + Result);
+                    if (img_is_set)
+                        uploadImg();
+                    createChatRoom();
+                    Toast.makeText(getApplicationContext(), "Party added", Toast.LENGTH_LONG).show();
+                }
             } catch (Exception e) {
                 Log.d("Logul din error", "onPostExecute");
                 e.printStackTrace();

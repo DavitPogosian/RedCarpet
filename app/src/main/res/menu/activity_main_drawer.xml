@@ -3,6 +3,11 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/all_parties"
+            android:icon="@drawable/party"
+            android:title="All Parties"
+            />
+        <item
             android:id="@+id/new_party"
             android:icon="@drawable/plus"
             android:title="Add Party"

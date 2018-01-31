@@ -1,6 +1,8 @@
 package com.example.davit.redcarpet.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,13 +26,12 @@ import org.json.JSONObject;
 
 import java.util.Formatter;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 
 public class AttendeeActivity extends AppCompatActivity {
 
 
-    private static final String INVITE_MESSAGE = "Hi, you are invited to the party %s on %s starting from %s";
+    private static final String INVITE_MESSAGE = "Hi, you are invited to the party %s starting at %s. Check RedCarpet for more info";
+    private static final int PERMISSION_READ_CONTACT = 2;
     private int partyId;
     private ListView list;
     private JSONArray attendees;
@@ -47,16 +48,16 @@ public class AttendeeActivity extends AppCompatActivity {
         partyId = getIntent().getIntExtra("PartyID", -1);
         partyName = getIntent().getStringExtra("PartyName");
         partyDate = getIntent().getStringExtra("PartyDate");
-        partyTime = getIntent().getStringExtra("PartyTime");
         list = (ListView) findViewById(R.id.allpartylist);
+        /*
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
 
-                    JSONObject productClicked = attendees.getJSONObject(position);
-                    Intent showDetails = new Intent(getApplicationContext(), PartyDetailsActivity.class);
-                    showDetails.putExtra("PartyID", productClicked.getInt("Id"));
+                    JSONObject userClicked = attendees.getJSONObject(position);
+                    Intent showDetails = new Intent(getApplicationContext(), ViewProfileActivity.class);
+                    showDetails.putExtra("org_id", userClicked.getInt("id"));
                     startActivity(showDetails);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -65,6 +66,7 @@ public class AttendeeActivity extends AppCompatActivity {
 
 
         });
+        */
         getAllAttendees(partyId);
     }
 
@@ -72,20 +74,29 @@ public class AttendeeActivity extends AppCompatActivity {
         new AsyncTask<ApiConnector, Long, JSONArray>() {
             @Override
             protected JSONArray doInBackground(ApiConnector... apiConnectors) {
-                return apiConnectors[0].getAttendees(partyId);
+                    return apiConnectors[0].getAttendees(partyId);
             }
             @Override
             protected void onPostExecute(JSONArray jsonArray)
             {
-                attendees = jsonArray;
-                fillAttendees();
+                if (jsonArray==null) {
+                    if (!Tools.tokenIsValid()) {
+                        Toast.makeText(getApplicationContext(), "You are disconnected", Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Error occurred, try again later", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    attendees = jsonArray;
+                    fillAttendees();
+                }
             }
 
         }.execute(new ApiConnector());
     }
 
     private void fillAttendees() {
-        list.setAdapter(new UserAdapter(attendees,this));
+        list.setAdapter(new UserAdapter(attendees,this, R.layout.attend_item));
     }
 
     public void back(View view) {
@@ -93,39 +104,64 @@ public class AttendeeActivity extends AppCompatActivity {
     }
 
     public void inviteFriend(View view) {
+        Boolean result=Tools.checkpermission(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS}, PERMISSION_READ_CONTACT);
+        if (result != null && result )
+            pickContact();
+
+    }
+
+    private void pickContact() {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, PERMISSION_READ_CONTACT);
 
     }
     @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (requestCode==PERMISSION_READ_CONTACT) {
+                boolean accepted=true;
+                for (int i=0;i<grantResults.length;i++) {
+                        accepted=accepted && grantResults[i]==PackageManager.PERMISSION_GRANTED;
+                }
+                if (accepted) {
+                    pickContact();
+                } else {
+                    Toast.makeText(getBaseContext(),"Permission denied to access/send sms to contact",Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data != null) {
-            Uri uri = data.getData();
+        if (requestCode==PERMISSION_READ_CONTACT) {
+            if (data != null) {
+                Uri uri = data.getData();
 
-            if (uri != null) {
-                Cursor c = null;
-                try {
-                    c = getContentResolver().query(uri, new String[]{
-                                    ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                    ContactsContract.CommonDataKinds.Phone.TYPE,
-                                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-                            },
-                            null, null, null);
+                if (uri != null) {
+                    Cursor c = null;
+                    try {
+                        c = getContentResolver().query(uri, new String[]{
+                                        ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                        ContactsContract.CommonDataKinds.Phone.TYPE,
+                                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                                },
+                                null, null, null);
 
-                    //while (c!=null && c.moveToNext()) {
-                    if (c != null && c.moveToFirst()) {
-                        String number = c.getString(0);
-                        int type = c.getInt(1);
-                        String name = c.getString(2);
-                        SmsManager sms = SmsManager.getDefault();
-                        String message=new Formatter().format(INVITE_MESSAGE, partyName, partyDate,partyTime).toString();
-                        sms.sendTextMessage(number, null, String.valueOf(message), null, null);
-                        Toast.makeText(getApplicationContext(),"Your friend "+name+" have been invited",Toast.LENGTH_SHORT).show();
-                    }
-                } finally {
-                    if (c != null) {
-                        c.close();
+                        //while (c!=null && c.moveToNext()) {
+                        if (c != null && c.moveToFirst()) {
+                            String number = c.getString(0);
+                            int type = c.getInt(1);
+                            String name = c.getString(2);
+                            SmsManager sms = SmsManager.getDefault();
+                            String message = new Formatter().format(INVITE_MESSAGE, partyName, partyDate).toString();
+                            sms.sendTextMessage(number, null, String.valueOf(message), null, null);
+                            Toast.makeText(getApplicationContext(), "Your friend " + name + " have been invited", Toast.LENGTH_SHORT).show();
+                        }
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
                     }
                 }
             }

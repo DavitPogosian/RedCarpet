@@ -43,7 +43,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:inputType="textPersonName"
+        android:inputType="number"
         android:ems="10"
         android:id="@+id/code"
         android:background="@drawable/edittextback"

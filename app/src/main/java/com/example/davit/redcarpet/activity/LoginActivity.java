@@ -127,12 +127,14 @@ public class LoginActivity extends AppCompatActivity {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
+
+
+        /* using internet <-> sms gateway
         PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
         PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
-
         //---when the SMS has been sent---
         registerReceiver(new BroadcastReceiver(){
             @Override
@@ -180,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }, new IntentFilter(DELIVERED));
-
+        */
         IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
         registerReceiver(new BroadcastReceiver() {
             @Override

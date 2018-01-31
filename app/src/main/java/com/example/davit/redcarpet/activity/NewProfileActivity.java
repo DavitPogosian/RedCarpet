@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
 import com.example.davit.redcarpet.R;
+import com.example.davit.redcarpet.Tools;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -89,43 +90,29 @@ public class NewProfileActivity extends AppCompatActivity {
         ProfPic = (CircleImageView) findViewById(R.id.prof_pic);
 
     }
-
-    public void setNumber() {
-        if (checkpermission()) {
-            try {
-                TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-                    return;
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case Tools.PREMISSION_READ_PHONE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setNumber();
+                } else {
+                    Toast.makeText(getBaseContext(), "Cannot get your phone number, please type it.", Toast.LENGTH_SHORT).show();
                 }
-                String mPhoneNumber = tMgr.getLine1Number();
-                Log.e("Number",mPhoneNumber);
-                PhonNumber=(TextView) findViewById(R.id.phon);
-                PhonNumber.setText(mPhoneNumber);
-                Number = mPhoneNumber;
-            } catch (Exception e) {
-                Log.e(TAG, e.toString());
+                break;
             }
         }
     }
-    public boolean checkpermission()
-    {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG,"Permission is granted");
-                return true;
-            } else {
-
-                Log.v(TAG,"Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-                return true;
-            }
-        }
-        else {
-            Log.v(TAG,"Permission is granted");
-            return true;
-        }
+    public void setNumber() {
+        String mPhoneNumber = Tools.getNumber(this);
+        if (mPhoneNumber==null)
+            return;
+        Log.e("Number",mPhoneNumber);
+        PhonNumber=(TextView) findViewById(R.id.phon);
+        PhonNumber.setText(mPhoneNumber);
+        Number = mPhoneNumber;
     }
 
     public void save(View view)
@@ -148,6 +135,7 @@ public class NewProfileActivity extends AppCompatActivity {
         //protected JSONArray doInBackground(ApiConnector... params)
         protected String doInBackground(ApiConnector... params)
         {
+            Number = PhonNumber.getText().toString();
             if(img_is_set)
             return params[0].AddProfile(Number,name, adres, info, Number);
 
@@ -166,8 +154,10 @@ public class NewProfileActivity extends AppCompatActivity {
                         uploadImg();
                     else
                     gotohome();
-                }else
-                {
+                } else if (Result!=null && Result.contains("ALREADY_EXIST")) {
+                    Toast.makeText(getApplicationContext(), "Your phone number is already registred, use Login", Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
                     Log.e(TAG,Result);
                     Toast.makeText(getApplicationContext(), "Something goes wrong : Please try again", Toast.LENGTH_LONG).show();
                 }
@@ -183,10 +173,11 @@ public class NewProfileActivity extends AppCompatActivity {
 
     public boolean success(String Result)
     {
-        if(Result.length()>ERROR_MESSAGE_MIN_LENGHT)
+        if(Result.length()>ERROR_MESSAGE_MIN_LENGHT || !Result.matches("\\d+"))
         {
             return false;
         }
+
         id=Integer.parseInt(Result);
         /*
         SharedPreferences.Editor ed = sp.edit();

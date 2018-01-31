@@ -1,7 +1,21 @@
 package com.example.davit.redcarpet.activity;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentResolver;
+import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.RawContacts;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,17 +32,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewProfileActivity extends AppCompatActivity {
 
 
+    private static final int PERMISSION_CONTACTS = 1;
     TextView Name;
     TextView Adress;
     TextView Info;
     TextView PhonNumber;
     CircleImageView ProfPic;
     private int OrgId;
+    private Dialog loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +59,98 @@ public class ViewProfileActivity extends AppCompatActivity {
         PhonNumber = (TextView) findViewById(R.id.phon);
         ProfPic = (CircleImageView) findViewById(R.id.prof_pic);
         OrgId = getIntent().getIntExtra("org_id",-1);
-
+        //TODO add user rating
+        loading = Tools.showLoading(this);
         new ViewProfileActivity.GetUserByID().execute(new ApiConnector());
     }
 
     public void back(View view) {
         finish();
     }
-
+    public String getFriend() {
+        String number=PhonNumber.getText().toString();
+        if (!"".equals(number.trim())) {
+            Uri lookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+            String[] mPhoneNumberProjection = { ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.NUMBER, ContactsContract.PhoneLookup.DISPLAY_NAME };
+            Cursor cur = this.getContentResolver().query(lookupUri, mPhoneNumberProjection, null, null, null);
+            try {
+                if (cur.moveToFirst()) {
+                    String name=cur.getString(cur.getColumnIndex(
+                            ContactsContract.Contacts.DISPLAY_NAME));
+                    return name;
+                }
+            } finally {
+                if (cur != null)
+                    cur.close();
+            }
+        }
+        return null;
+    }
     public void addFriend(View view) {
-        Toast.makeText(getApplicationContext(),"Friend added",Toast.LENGTH_SHORT).show();
+        Boolean checkPermission=Tools.checkpermission(this, new String[]{ Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS}, PERMISSION_CONTACTS);
+        if (checkPermission!=null && checkPermission)
+            addFriendToContact();
+    }
+    private void addFriendToContact() {
+        String friendName=getFriend();
+        if (friendName==null) {
+
+            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            int rawContactInsertIndex = ops.size();
+
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(RawContacts.ACCOUNT_NAME, null).build());
+
+            //Phone Number
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,
+                            rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, PhonNumber.getText().toString())
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, "1").build());
+
+            //Display name/Contact name
+            ops.add(ContentProviderOperation
+                    .newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,
+                            rawContactInsertIndex)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, Name.getText().toString())
+                    .build());
+
+            try {
+                ContentProviderResult[] res = getContentResolver().applyBatch(
+                        ContactsContract.AUTHORITY, ops);
+                Toast.makeText(getBaseContext(), "Friend added", Toast.LENGTH_SHORT).show();
+            } catch (RemoteException e) {
+                Toast.makeText(getBaseContext(), "Unable to add Friend " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            } catch (OperationApplicationException e) {
+                Toast.makeText(getBaseContext(), "Unable to add Friend " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(getBaseContext(), "Contact already exist (" + friendName+")", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CONTACTS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addFriendToContact();
+                } else {
+                    Toast.makeText(getBaseContext(),"Permission denied to add Friend ",Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+        }
     }
 
     private class GetUserByID extends AsyncTask<ApiConnector,Long,JSONArray>
@@ -61,8 +162,12 @@ public class ViewProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
+            loading.cancel();
             try {
-                fillUserInformation(jsonArray.getJSONObject(0));
+                if (jsonArray!=null && jsonArray.length()>0)
+                    fillUserInformation(jsonArray.getJSONObject(0));
+                else
+                    Toast.makeText(getBaseContext(), "Unable to get user information, try again later", Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -75,7 +180,7 @@ public class ViewProfileActivity extends AppCompatActivity {
         Adress.setText(jsonObject.getString("adress"));
         Info.setText(jsonObject.getString("info"));
         PhonNumber.setText(jsonObject.getString("number"));
-        String url = Tools.IMAGES_URL + jsonObject.getString("number") + ".jpg";
+        String url = Tools.IMAGES_URL + jsonObject.getString("image") + ".jpg";
         Log.e("url", url);
         Picasso.with(this).load(url)
                 .placeholder(R.drawable.prof_pic_def)

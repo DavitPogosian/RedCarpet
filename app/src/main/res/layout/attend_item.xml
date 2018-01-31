@@ -6,7 +6,7 @@
     android:padding="10dp"
     android:gravity="center_vertical|center_horizontal">
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/prof_img"
+        android:id="@+id/party_image"
         android:layout_width="78dp"
         android:layout_height="80dp"
         android:src="@drawable/prof_pic_def"
@@ -26,15 +26,19 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Name"
-            android:id="@+id/product_name"
+            android:id="@+id/Name"
+            android:textColor="@color/partiItemText"
             />
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Number"
-            android:id="@+id/product_name_ro"
+            android:text="attend"
+            android:id="@+id/attend"
             android:layout_weight="1"
-            android:layout_marginTop="15dp"/>
+            android:layout_marginTop="15dp"
+            android:textColor="@color/partiItemText"/>
+
 
     </LinearLayout>
 
