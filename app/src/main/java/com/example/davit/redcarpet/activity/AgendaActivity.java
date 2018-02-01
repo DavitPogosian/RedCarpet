@@ -51,6 +51,7 @@ public class AgendaActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }});
+
     }
     public void setListAdapter(JSONArray jsonArray)
     {
