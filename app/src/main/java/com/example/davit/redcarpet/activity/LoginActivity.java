@@ -146,7 +146,8 @@ public class LoginActivity extends AppCompatActivity {
                         setResult(200);
                         registerLogin(originNumber, user.getInt("id"),user.getString("number"), user.getString("name"), object.getString("token"));
                         Toast.makeText(getBaseContext(), "Successfully verified", Toast.LENGTH_SHORT).show();
-                        finish();
+                        Intent go = new Intent(getBaseContext(), MainActivity.class);
+                        startActivity(go);
                         return;
                     }
                 } catch (JSONException e) {
