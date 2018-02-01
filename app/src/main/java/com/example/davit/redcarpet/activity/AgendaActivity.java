@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
@@ -26,9 +27,15 @@ public class AgendaActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //todo starakan bazmakan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.agenda);
         nextPartylist = findViewById(R.id.nextPartylist);
+        View headerView = getLayoutInflater().inflate(R.layout.header_view, nextPartylist, false);
+        TextView header = (TextView) headerView.findViewById(R.id.headerTitle);
+        header.setText("Agenda: Your next parties");
+        nextPartylist.addHeaderView(headerView);
+        nextPartylist.setEmptyView(findViewById(R.id.notFoundText));
 
         new AgendaActivity.GetNextParties().execute(new ApiConnector());
 
@@ -36,8 +43,7 @@ public class AgendaActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
-
-                    JSONObject productClicked = nextParties.getJSONObject(position);
+                    JSONObject productClicked = nextParties.getJSONObject(position-1);
                     Intent showDetails = new Intent(getApplicationContext(), PartyDetailsActivity.class);
                     showDetails.putExtra("PartyID", productClicked.getInt("id"));
                     startActivity(showDetails);

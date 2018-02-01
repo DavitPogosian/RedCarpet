@@ -153,7 +153,10 @@ public class EditMyPartyActivity extends AppCompatActivity {
                     Log.d("Result","Result = "+Result);
                     if(img_is_set)
                         uploadImg();
-                    else gotoHome();
+                    else {
+                        Toast.makeText(getBaseContext(),"Party updated", Toast.LENGTH_SHORT).show();
+                        gotoHome();
+                    }
 
                 } catch (Exception e) {
                     Log.d("Logul din error", "onPostExecute");
@@ -172,7 +175,24 @@ public class EditMyPartyActivity extends AppCompatActivity {
     }
 
     public void delete(View view) {
+        new AsyncTask<ApiConnector, Long, Boolean>() {
+            @Override
+            protected Boolean doInBackground(ApiConnector... apiConnectors) {
+                return apiConnectors[0].deleteParty(Party_id);
+            }
+            @Override
+            protected void onPostExecute(Boolean success)
+            {
+                if (success) {
+                    Toast.makeText(getBaseContext(), "Party deleted", Toast.LENGTH_SHORT).show();
+                    gotoHome();
+                } else
+                    Toast.makeText(getBaseContext(),"Cannot delete party, try later.", Toast.LENGTH_SHORT).show();
+
+            }
+        }.execute(new ApiConnector());
     }
+
     public boolean validation()
     {
         DateTimeValidator dateTimeValidator= new DateTimeValidator();
@@ -322,6 +342,7 @@ public class EditMyPartyActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean result)
             {
+                Toast.makeText(getBaseContext(),"Party updated", Toast.LENGTH_SHORT).show();
                 gotoHome();
             }
         }.execute(new ApiConnector());

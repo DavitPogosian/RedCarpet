@@ -13,6 +13,7 @@ import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
@@ -31,7 +32,6 @@ public class AttendeeActivity extends AppCompatActivity {
 
 
     private static final String INVITE_MESSAGE = "Hi, you are invited to the party %s starting at %s. Check RedCarpet for more info";
-    private static final int PERMISSION_READ_CONTACT = 2;
     private int partyId;
     private ListView list;
     private JSONArray attendees;
@@ -49,13 +49,20 @@ public class AttendeeActivity extends AppCompatActivity {
         partyName = getIntent().getStringExtra("PartyName");
         partyDate = getIntent().getStringExtra("PartyDate");
         list = (ListView) findViewById(R.id.allpartylist);
+
+        View headerView = getLayoutInflater().inflate(R.layout.header_view, list, false);
+        ((TextView) headerView.findViewById(R.id.headerTitle)).setText("Attendees");
+        list.addHeaderView(headerView);
+        TextView emptyText = (TextView) findViewById(R.id.notFoundText);
+        emptyText.setText("No attendee yet");
+        list.setEmptyView(emptyText);
         /*
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
 
-                    JSONObject userClicked = attendees.getJSONObject(position);
+                    JSONObject userClicked = attendees.getJSONObject(position-1);
                     Intent showDetails = new Intent(getApplicationContext(), ViewProfileActivity.class);
                     showDetails.putExtra("org_id", userClicked.getInt("id"));
                     startActivity(showDetails);
@@ -104,7 +111,7 @@ public class AttendeeActivity extends AppCompatActivity {
     }
 
     public void inviteFriend(View view) {
-        Boolean result=Tools.checkpermission(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS}, PERMISSION_READ_CONTACT);
+        Boolean result=Tools.checkPermissions(this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS}, Tools.PERMISSION_READ_CONTACTS);
         if (result != null && result )
             pickContact();
 
@@ -113,18 +120,14 @@ public class AttendeeActivity extends AppCompatActivity {
     private void pickContact() {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-        startActivityForResult(intent, PERMISSION_READ_CONTACT);
+        startActivityForResult(intent, Tools.PERMISSION_READ_CONTACTS);
 
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        if (requestCode==PERMISSION_READ_CONTACT) {
-                boolean accepted=true;
-                for (int i=0;i<grantResults.length;i++) {
-                        accepted=accepted && grantResults[i]==PackageManager.PERMISSION_GRANTED;
-                }
-                if (accepted) {
+        if (requestCode==Tools.PERMISSION_READ_CONTACTS) {
+                if (Tools.isAllPermissionsGranted(grantResults)) {
                     pickContact();
                 } else {
                     Toast.makeText(getBaseContext(),"Permission denied to access/send sms to contact",Toast.LENGTH_SHORT).show();
@@ -134,7 +137,7 @@ public class AttendeeActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode==PERMISSION_READ_CONTACT) {
+        if (requestCode==Tools.PERMISSION_READ_CONTACTS) {
             if (data != null) {
                 Uri uri = data.getData();
 

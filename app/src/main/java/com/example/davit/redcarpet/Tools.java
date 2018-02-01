@@ -1,21 +1,18 @@
 package com.example.davit.redcarpet;
 
-import android.*;
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.util.ArrayList;
@@ -25,15 +22,20 @@ import java.util.List;
 
 public class Tools {
     public final static String TAG = "Tools";
-    public final static String WEBSERVER = "https://redcarpetproject.000webhostapp.com/";
-    public final static String IMAGES_URL = WEBSERVER + "images/";
-    public static final int PREMISSION_READ_PHONE = 1;
+    public final static String ROOT_URL = "https://redcarpetproject.000webhostapp.com/";//"http://10.0.3.1/www/RedCarpet/";
+    public final static String IMAGES_URL = ROOT_URL + "images/";
+    // request Id for premission
+    public static final int PERMISSION_READ_PHONE = 1;
+    public static final int PERMISSION_RECEIVE_SMS = 2;
+    public static final int PERMISSION_SEND_SMS = 3;
+    public static final int PERMISSION_READ_CONTACTS=4;
+
     public static String currentToken = "";
     public static int currentId = 0;
     private static boolean tokenIsValid = true;
 
 
-    public static final String WILL_GO="Will go"; //1
+    public static final String WILL_GO="Will go";
     public static final String GOING="Going";
     public static final String CHECK_IN="Check IN";
     public static final String CHECK_OUT="Check OUT";
@@ -53,11 +55,11 @@ public class Tools {
         }
         return 0;
     }
-    public static Dialog showLoading(AppCompatActivity app) {
+    public static Dialog showLoading(Activity app) {
         return showLoading(app, "Loading. Please wait...");
     }
 
-    public static Dialog showLoading(AppCompatActivity app, String message) {
+    public static Dialog showLoading(Activity app, String message) {
         ProgressDialog dialog = new ProgressDialog(app);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage(message);
@@ -68,16 +70,11 @@ public class Tools {
 
     }
 
-
-    @SuppressLint("MissingPermission")
-    public static String getNumber(AppCompatActivity app) {
+    public static String getNumber(Activity app) {
         try {
             TelephonyManager tMgr = (TelephonyManager) app.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-            Boolean check = checkpermission(app, new String[]{
-                    android.Manifest.permission.READ_PHONE_STATE,
-                    Manifest.permission.READ_PHONE_NUMBERS,
-                    Manifest.permission.READ_SMS
-            }, PREMISSION_READ_PHONE);
+            //android.Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_SMS
+            Boolean check = checkPermission(app, Manifest.permission.READ_PHONE_NUMBERS, PERMISSION_READ_PHONE);
             if (check !=null && check) {
                 return tMgr.getLine1Number();
             } else
@@ -87,10 +84,11 @@ public class Tools {
         }
         return null;
     }
-    public static Boolean checkpermission(AppCompatActivity app, String permission, int requestCode)  {
-        return checkpermission(app, new String[]{ permission },requestCode);
+    public static Boolean checkPermission(Activity app, String permission, int requestCode)  {
+        return checkPermissions(app, new String[]{ permission },requestCode);
     }
-    public static Boolean checkpermission(AppCompatActivity app, String[] permissions, int requestCode)
+
+    public static Boolean checkPermissions(Activity app, String[] permissions, int requestCode)
     {
         if (Build.VERSION.SDK_INT >= 23) {
             List<String> permissionsToRequest=new ArrayList();
@@ -112,6 +110,9 @@ public class Tools {
             return true;
         }
     }
+
+
+
     /* Date tools */
 
     public static Calendar getDateFrom(String formatedDate) {
@@ -135,7 +136,7 @@ public class Tools {
         // remember to update pickDate, getDateFrom and DateTimeValidator if you change format
         return systemDate.substring(0,systemDate.length()-3);// just remove seconds for now
     }
-    public static void pickDate(final EditText currentDate, AppCompatActivity activity) {
+    public static void pickDate(final EditText currentDate, Activity activity) {
         final Dialog dialog = new Dialog(activity);
 
         dialog.setContentView(R.layout.date_time);
@@ -147,7 +148,7 @@ public class Tools {
         Calendar calendarDate = getDateFrom(currentDate.getText().toString());
 
         if (calendarDate!=null) {
-            datePicker.updateDate(calendarDate.get(Calendar.YEAR), calendarDate.get(Calendar.MONTH)-1, calendarDate.get(Calendar.DAY_OF_MONTH));
+            datePicker.updateDate(calendarDate.get(Calendar.YEAR), calendarDate.get(Calendar.MONTH), calendarDate.get(Calendar.DAY_OF_MONTH));
             timePicker.setCurrentHour(calendarDate.get(Calendar.HOUR)); timePicker.setCurrentMinute(Calendar.MINUTE);
         }
         dialog.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
@@ -181,5 +182,13 @@ public class Tools {
     }
     public static void validateToken() {
         tokenIsValid = true;
+    }
+
+    public static boolean isAllPermissionsGranted(int[] grantResults) {
+        boolean accepted=true;
+        for (int i=0;i<grantResults.length;i++) {
+            accepted=accepted && grantResults[i]==PackageManager.PERMISSION_GRANTED;
+        }
+        return accepted;
     }
 }

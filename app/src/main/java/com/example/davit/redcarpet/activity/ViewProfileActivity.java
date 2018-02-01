@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,13 +40,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewProfileActivity extends AppCompatActivity {
 
-
-    private static final int PERMISSION_CONTACTS = 1;
     TextView Name;
     TextView Adress;
     TextView Info;
     TextView PhonNumber;
     CircleImageView ProfPic;
+    RatingBar rating;
     private int OrgId;
     private Dialog loading;
 
@@ -58,8 +58,10 @@ public class ViewProfileActivity extends AppCompatActivity {
         Info = (TextView) findViewById(R.id.info);
         PhonNumber = (TextView) findViewById(R.id.phon);
         ProfPic = (CircleImageView) findViewById(R.id.prof_pic);
+        rating = (RatingBar) findViewById(R.id.ratingBar);
+
+
         OrgId = getIntent().getIntExtra("org_id",-1);
-        //TODO add user rating
         loading = Tools.showLoading(this);
         new ViewProfileActivity.GetUserByID().execute(new ApiConnector());
     }
@@ -87,7 +89,7 @@ public class ViewProfileActivity extends AppCompatActivity {
         return null;
     }
     public void addFriend(View view) {
-        Boolean checkPermission=Tools.checkpermission(this, new String[]{ Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS}, PERMISSION_CONTACTS);
+        Boolean checkPermission=Tools.checkPermissions(this, new String[]{ Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS}, Tools.PERMISSION_READ_CONTACTS);
         if (checkPermission!=null && checkPermission)
             addFriendToContact();
     }
@@ -141,9 +143,8 @@ public class ViewProfileActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_CONTACTS: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case Tools.PERMISSION_READ_CONTACTS: {
+                if (Tools.isAllPermissionsGranted(grantResults)) {
                     addFriendToContact();
                 } else {
                     Toast.makeText(getBaseContext(),"Permission denied to add Friend ",Toast.LENGTH_SHORT).show();
@@ -173,6 +174,20 @@ public class ViewProfileActivity extends AppCompatActivity {
             }
         }
     }
+    public class RateUser extends AsyncTask<ApiConnector,Long,JSONObject> {
+        @Override
+        protected JSONObject doInBackground(ApiConnector... apiConnectors) {
+            Log.e("Rating", String.valueOf(rating.getRating()));
+            return apiConnectors[0].rate(OrgId, rating.getRating());
+        }
+        @Override
+        protected void onPostExecute(JSONObject result) {
+            if (result!=null && result.has("success") && !result.has("error")) {
+                Toast.makeText(getBaseContext(), "Rate recorded, thanks for voting", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getBaseContext(), "Unable to rate, try later", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void fillUserInformation (JSONObject jsonObject) throws JSONException {
         //`id`, `number`, `name`, `adress`, `info`, `image`
@@ -180,6 +195,16 @@ public class ViewProfileActivity extends AppCompatActivity {
         Adress.setText(jsonObject.getString("adress"));
         Info.setText(jsonObject.getString("info"));
         PhonNumber.setText(jsonObject.getString("number"));
+        String rate=jsonObject.getString("Rating");
+        if (rate != null && rate.matches("\\d*\\.\\d+"))
+            rating.setRating((float) jsonObject.getDouble("Rating"));
+        rating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean fromUser) {
+                Log.e("Change Ratting ", String.valueOf(v)+" / "+ratingBar.getNumStars());
+                new ViewProfileActivity.RateUser().execute(new ApiConnector());
+            }
+        });
         String url = Tools.IMAGES_URL + jsonObject.getString("image") + ".jpg";
         Log.e("url", url);
         Picasso.with(this).load(url)
@@ -187,4 +212,5 @@ public class ViewProfileActivity extends AppCompatActivity {
                 .error(R.drawable.prof_pic_def)
                 .into(ProfPic);
     }
+
 }

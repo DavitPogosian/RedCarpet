@@ -2,7 +2,6 @@ package com.example.davit.redcarpet;
 
 
 import android.util.Log;
-import android.view.WindowManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,237 +26,64 @@ import java.util.List;
 
 public class ApiConnector {
     public ApiConnector() {}
-    private final static String baseurl=Tools.WEBSERVER;
 
     public JSONArray GetAllParties() {
-        String response = sendHttpGet(baseurl+"GetAllParties.php");
-
-        JSONArray jsonArray = null;
-
-        if (response != null) {
-            try {
-                Log.d("Entity Response  : ", response);
-                jsonArray = new JSONArray(response);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return jsonArray;
+        return getArray(sendHttpGet("GetAllParties.php"));
     }
     public JSONArray GetNextParties() {
-        String url = baseurl+"GetNextParties.php";
-        try {
-            return new JSONArray(sendHttpGet(url));
-        } catch (JSONException e) {
-            return null;
-        }
+        return getArray(sendHttpGet("GetNextParties.php"));
     }
 
-
     public JSONArray MyParties(int id) {
-        String url = baseurl + "MyParties.php";
-        HttpEntity httpEntity = null;
-
-
-        try {
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(url);
-            addToken(httpPost);
-            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(9);
-            nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                HttpResponse httpResponse = httpClient.execute(httpPost);
-                // write response to log
-                Log.d("Http Post Response:", httpResponse.toString());
-                httpEntity = httpResponse.getEntity();
-            } catch (ClientProtocolException e) {
-                // Log exception
-                e.printStackTrace();
-            } catch (IOException e) {
-                // Log exception
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            // Log exception
-            e.printStackTrace();
-        }
-
-        String entityResponse = null;
-        JSONArray jsonArray = null;
-        if (httpEntity != null) {
-            try {
-                entityResponse = EntityUtils.toString(httpEntity);
-                Log.e("Entity Response  : ", entityResponse);
-                jsonArray = new JSONArray(entityResponse);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return jsonArray;
-
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
+        nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
+        return getArray(sendHttpPost("MyParties.php", nameValuePair));
     }
 
     public JSONArray GetPartyById(String id)
     {
-        String url = baseurl+"GetPartyById.php";
-        HttpEntity httpEntity = null;
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
         nameValuePair.add(new BasicNameValuePair("id", id));
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Log.e("UnsupportedEncoding",e.toString());
-        }
-        try {
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", httpResponse.toString());
-            httpEntity = httpResponse.getEntity();
-        } catch (ClientProtocolException e) {
-            Log.e("ClientProtocolException",e.toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e("IOException",e.toString());
-            e.printStackTrace();
-        } catch (Exception e) {
-            Log.e("Exception",e.toString());
-            e.printStackTrace();
-        }
-        JSONArray jsonArray = null;
-
-        if (httpEntity != null) {
-            try {
-                String entityResponse = EntityUtils.toString(httpEntity);
-
-                Log.d("Entity Response  : ", entityResponse);
-
-                jsonArray = new JSONArray(entityResponse);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSONException",e.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("IOException",e.toString());
-            }
-        }
-
-        return jsonArray;
+        return getArray(sendHttpPost("GetPartyById.php", nameValuePair));
     }
     public JSONArray ShowPartyById(String id) {
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
         nameValuePair.add(new BasicNameValuePair("id", id));
-        String result = sendHttpPost(baseurl+"ShowPartyById.php", nameValuePair);
-        JSONArray jsonArray = null;
-
-        if (result!= null) {
-            try {
-                jsonArray = new JSONArray(result);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSONException",e.toString());
-            }
-        }
-
-        return jsonArray;
+        return getArray(sendHttpPost("ShowPartyById.php", nameValuePair));
     }
 
     public JSONArray GetPartyByUserId(int id)
     {
-        String ID= String.valueOf(id);
-        String url = baseurl+"GetPartyByUserId.php";
-        HttpEntity httpEntity = null;
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
-        nameValuePair.add(new BasicNameValuePair("user_id", ID));
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Log.e("UnsupportedEncoding",e.toString());
-        }
-        try {
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", httpResponse.toString());
-            httpEntity = httpResponse.getEntity();
-        } catch (ClientProtocolException e) {
-            Log.e("ClientProtocolException",e.toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e("IOException",e.toString());
-            e.printStackTrace();
-        } catch (Exception e) {
-            Log.e("Exception",e.toString());
-            e.printStackTrace();
-        }
-        JSONArray jsonArray = null;
-
-        if (httpEntity != null) {
-            try {
-                String entityResponse = EntityUtils.toString(httpEntity);
-
-                Log.d("Entity Response  : ", entityResponse);
-
-                jsonArray = new JSONArray(entityResponse);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSONException",e.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("IOException",e.toString());
-            }
-        }
-
-        return jsonArray;
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
+        nameValuePair.add(new BasicNameValuePair("user_id", String.valueOf(id)));
+        return getArray(sendHttpPost("GetPartyByUserId.php", nameValuePair));
     }
 
     public String AddParty(String name, String startDate , String endDate, String andress, String adresshint, String description, String user_id,String image ) {
-       // Party(name, start, end, andress, adresshint, description, user_id, image)
-        String url = baseurl+"AddParty.php";
-            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(9);
-            nameValuePair.add(new BasicNameValuePair("name", name));
-            nameValuePair.add(new BasicNameValuePair("startDate", startDate));
-            nameValuePair.add(new BasicNameValuePair("endDate", endDate));
-            nameValuePair.add(new BasicNameValuePair("andress", andress));
-            nameValuePair.add(new BasicNameValuePair("adresshint", adresshint));
-            nameValuePair.add(new BasicNameValuePair("description", description));
-            nameValuePair.add(new BasicNameValuePair("user_id", user_id));
-            nameValuePair.add(new BasicNameValuePair("image", image));
-            return sendHttpPost(url, nameValuePair);
-
-        }
+        // Party(name, start, end, andress, adresshint, description, user_id, image)
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(8);
+        nameValuePair.add(new BasicNameValuePair("name", name));
+        nameValuePair.add(new BasicNameValuePair("startDate", startDate));
+        nameValuePair.add(new BasicNameValuePair("endDate", endDate));
+        nameValuePair.add(new BasicNameValuePair("andress", andress));
+        nameValuePair.add(new BasicNameValuePair("adresshint", adresshint));
+        nameValuePair.add(new BasicNameValuePair("description", description));
+        nameValuePair.add(new BasicNameValuePair("user_id", user_id));
+        nameValuePair.add(new BasicNameValuePair("image", image));
+        return sendHttpPost("AddParty.php", nameValuePair);
+    }
 
     public String AddProfile(String number,String name, String adress, String info, String image)
     {
-        String url = baseurl+"AddProfile.php";
-
-            List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
-            nameValuePair.add(new BasicNameValuePair("number", number));
-            nameValuePair.add(new BasicNameValuePair("name", name));
-            nameValuePair.add(new BasicNameValuePair("adress", adress));
-            nameValuePair.add(new BasicNameValuePair("info", info));
-            nameValuePair.add(new BasicNameValuePair("image", image));
-            return sendHttpPost(baseurl+"AddProfile.php", nameValuePair, false);
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
+        nameValuePair.add(new BasicNameValuePair("number", number));
+        nameValuePair.add(new BasicNameValuePair("name", name));
+        nameValuePair.add(new BasicNameValuePair("adress", adress));
+        nameValuePair.add(new BasicNameValuePair("info", info));
+        nameValuePair.add(new BasicNameValuePair("image", image));
+        return sendHttpPost("AddProfile.php", nameValuePair, false);
     }
     public String EditProfile(int id,String number,String name, String adress, String info, String image) {
-        String url = baseurl+"EditProfile.php";
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(6);
         nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
         nameValuePair.add(new BasicNameValuePair("number", number));
@@ -265,154 +91,23 @@ public class ApiConnector {
         nameValuePair.add(new BasicNameValuePair("adress", adress));
         nameValuePair.add(new BasicNameValuePair("info", info));
         nameValuePair.add(new BasicNameValuePair("image", image));
-        return sendHttpPost(url,nameValuePair);
+        return sendHttpPost("EditProfile.php",nameValuePair);
     }
-
-
-
-    public Boolean uploadImageToserver(List<NameValuePair> params) {
-
-        String url = baseurl+ "uploadImage.php";
-
-        HttpEntity httpEntity = null;
-
-        try
-        {
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();  // Default HttpClient
-
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setEntity(new UrlEncodedFormEntity(params));
-
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-
-            httpEntity = httpResponse.getEntity();
-            String entityResponse = EntityUtils.toString(httpEntity);
-
-            Log.e("Entity Response  : ", entityResponse);
-            return true;
-
-        } catch (ClientProtocolException e) {
-
-            // Signals error in http protocol
-            e.printStackTrace();
-
-            //Log Errors Her
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public JSONArray GetUserByID(int id)
     {
-        String ID= String.valueOf(id);
-        String url = baseurl+"GetUserByID.php";
-        HttpEntity httpEntity = null;
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
-        nameValuePair.add(new BasicNameValuePair("id", ID));
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Log.e("UnsupportedEncoding",e.toString());
-        }
-        try {
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", httpResponse.toString());
-            httpEntity = httpResponse.getEntity();
-        } catch (ClientProtocolException e) {
-            Log.e("ClientProtocolException",e.toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e("IOException",e.toString());
-            e.printStackTrace();
-        } catch (Exception e) {
-            Log.e("Exception",e.toString());
-            e.printStackTrace();
-        }
-        JSONArray jsonArray = null;
-
-        if (httpEntity != null) {
-            try {
-                String entityResponse = EntityUtils.toString(httpEntity);
-
-                Log.d("Entity Response  : ", entityResponse);
-
-                jsonArray = new JSONArray(entityResponse);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSONException",e.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("IOException",e.toString());
-            }
-        }
-
-        return jsonArray;
+        nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
+        return getArray(sendHttpPost("GetUserByID.php", nameValuePair));
     }
     public JSONArray GetUserByNumber(String number)
     {
-
-        String url = baseurl+"GetUserByNumber.php";
-        HttpEntity httpEntity = null;
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(5);
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
         nameValuePair.add(new BasicNameValuePair("number", number));
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            Log.e("UnsupportedEncoding",e.toString());
-        }
-        try {
-            HttpResponse httpResponse = httpClient.execute(httpPost);
-            // write response to log
-            Log.d("Http Post Response:", httpResponse.toString());
-            httpEntity = httpResponse.getEntity();
-        } catch (ClientProtocolException e) {
-            Log.e("ClientProtocolException",e.toString());
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.e("IOException",e.toString());
-            e.printStackTrace();
-        } catch (Exception e) {
-            Log.e("Exception",e.toString());
-            e.printStackTrace();
-        }
-        JSONArray jsonArray = null;
-
-        if (httpEntity != null) {
-            try {
-                String entityResponse = EntityUtils.toString(httpEntity);
-
-                Log.d("Entity Response  : ", entityResponse);
-
-                jsonArray = new JSONArray(entityResponse);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSONException",e.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("IOException",e.toString());
-            }
-        }
-
-        return jsonArray;
+        return getArray(sendHttpPost("GetUserByNumber.php", nameValuePair));
     }
 
     public String EditParty(String name, String startDate , String endDate, String andress, String adresshint, String description, String user_id,String image, int id ) {
         // Party(name, date, start, end, andress, adresshint, description, user_id, image)
-        String url = baseurl+"EditParty.php";
-
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(10);
         nameValuePair.add(new BasicNameValuePair("name", name));
         nameValuePair.add(new BasicNameValuePair("startDate", startDate));
@@ -423,86 +118,65 @@ public class ApiConnector {
         nameValuePair.add(new BasicNameValuePair("user_id", user_id));
         nameValuePair.add(new BasicNameValuePair("image", image));
         nameValuePair.add(new BasicNameValuePair("id", String.valueOf(id)));
-
-
-        return sendHttpPost(url, nameValuePair);
+        return sendHttpPost("EditParty.php", nameValuePair);
     }
     public JSONObject sendSMS(String number) {
-        String url = baseurl + "SendSMS.php";
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
         nameValuePair.add(new BasicNameValuePair("phone", number));
-
-        try {
-            return new JSONObject(sendHttpPost(url, nameValuePair, false));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            try {
-                return new JSONObject().put("success", false).put("error", e.getMessage());
-            } catch (JSONException e1) {
-                return null;
-            }
-        }
+        return getObject(sendHttpPost("SendSMS.php", nameValuePair, false));
     }
 
+
+
     public JSONObject checkSMS(String number, String code)  {
-        String url = baseurl+"CheckSMS.php";
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
         nameValuePair.add(new BasicNameValuePair("phone", number));
         nameValuePair.add(new BasicNameValuePair("code", code));
-        try {
-            return new JSONObject(sendHttpPost(url, nameValuePair, false));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            try {
-                return new JSONObject().put("success", false).put("error", e.getMessage());
-            } catch (JSONException e1) {
-                return null;
-            }
-        }
+        return getObject(sendHttpPost("CheckSMS.php", nameValuePair, false));
     }
     public JSONArray GetRegistredFriends(String friends) {
-        String url = baseurl+"GetRegistredFriends.php";
         List<NameValuePair> nameValuePairs = new ArrayList<>(1);
         nameValuePairs.add(new BasicNameValuePair("friends", friends));
-        try {
-            return new JSONArray(sendHttpPost(url, nameValuePairs));
-        } catch (JSONException e) {
-            return null;
-        } catch (NullPointerException e) {
-            return null;
-        }
+        return getArray(sendHttpPost("GetRegistredFriends.php", nameValuePairs));
     }
 
     public JSONArray getAttendees(int partyId) {
-        String url = baseurl + "GetPartyAttendees.php";
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
         nameValuePair.add(new BasicNameValuePair("partyId", String.valueOf(partyId)));
-        try {
-            return new JSONArray(sendHttpPost(url, nameValuePair));
-        } catch (JSONException e) {
-            return null;
-        } catch (NullPointerException e) {
-            return null;
-        }
+        return getArray(sendHttpPost("GetPartyAttendees.php", nameValuePair));
     }
     public Boolean attend(int partyId, int status) {
-        String url = baseurl + "AttendParty.php";
         List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
         nameValuePair.add(new BasicNameValuePair("partyId", String.valueOf(partyId)));
         nameValuePair.add(new BasicNameValuePair("status", String.valueOf(status)));
-        String result = sendHttpPost(url, nameValuePair);
+        String result = sendHttpPost("AttendParty.php", nameValuePair);
         return (result!=null)?"1".equals(result):null;
     }
-
-    private String sendHttpGet(String url) {
-        return sendHttpGet(url, true);
+    public JSONObject rate(int user_id, float rating){
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
+        nameValuePair.add(new BasicNameValuePair("user_id", String.valueOf(user_id)));
+        nameValuePair.add(new BasicNameValuePair("rate", String.valueOf((int) rating)));
+        return getObject(sendHttpPost("rate.php", nameValuePair));
     }
-    private String sendHttpGet(String url, boolean addToken) {
+
+    public Boolean uploadImageToserver(List<NameValuePair> params) {
+        String result = sendHttpPost("uploadImage.php", params);
+        return result != null && !result.contains("error");
+    }
+    public boolean deleteParty(int party_id) {
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
+        nameValuePair.add(new BasicNameValuePair("party_id", String.valueOf(party_id)));
+        return "1".equals(sendHttpPost("DeleteParty.php",nameValuePair));
+    }
+    private String sendHttpGet(String uri) {
+        return sendHttpGet(uri, true);
+    }
+    private String sendHttpGet(String uri, boolean addToken) {
         HttpEntity httpEntity = null;
         try {
-            Log.i("HttpGET",url);
+            Log.i("HttpGET",uri);
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(url);
+            HttpGet httpGet = new HttpGet(Tools.ROOT_URL+uri);
             if (addToken)
                 addToken(httpGet);
 
@@ -531,7 +205,7 @@ public class ApiConnector {
             try {
                 entityResponse = EntityUtils.toString(httpEntity);
                 if (entityResponse.startsWith("AUTH_ERROR")) {
-                    Log.e("HttpGet", "Bad token "+url);
+                    Log.e("HttpGet", "Bad token "+uri);
                     Tools.invalidateToken();
                 }
                 Log.e("Entity Response  : ", entityResponse);
@@ -543,15 +217,15 @@ public class ApiConnector {
         return entityResponse;
     }
 
-    private String sendHttpPost(String url, List<NameValuePair> nameValuePair) {
-        return sendHttpPost(url, nameValuePair, true);
+    private String sendHttpPost(String uri, List<NameValuePair> nameValuePair) {
+        return sendHttpPost(uri, nameValuePair, true);
     }
-    private String sendHttpPost(String url, List<NameValuePair> nameValuePair, boolean addToken) {
+    private String sendHttpPost(String uri, List<NameValuePair> nameValuePair, boolean addToken) {
         HttpEntity httpEntity = null;
         try {
-            Log.i("HttpPost",url);
+            Log.i("HttpPost",uri);
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(Tools.ROOT_URL+uri);
             if (addToken)
                 addToken(httpPost);
             try {
@@ -585,7 +259,7 @@ public class ApiConnector {
                 entityResponse = EntityUtils.toString(httpEntity);
                 Log.e("Entity Response  : ", entityResponse);
                 if (entityResponse.startsWith("AUTH_ERROR")) {
-                    Log.e("HttpGet", "Bad token "+url);
+                    Log.e("HttpGet", "Bad token "+uri);
                     Tools.invalidateToken();
                 }
             } catch (IOException e) {
@@ -599,6 +273,29 @@ public class ApiConnector {
     private void addToken(HttpRequestBase request) {
         request.addHeader("token", Tools.getCurrentId()+"-"+Tools.getCurrentToken());
     }
+
+
+    private JSONArray getArray(String jsonArray) {
+        if (jsonArray != null)
+            try {
+                return new JSONArray(jsonArray);
+            } catch (JSONException e) {
+            }
+        return null;
+    }
+    private JSONObject getObject(String s) {
+        if (s!=null)
+            try {
+                return new JSONObject(s);
+            } catch (JSONException e) {
+                try {
+                    return new JSONObject().put("success", false).put("error", "Response parse error:"+e.getMessage());
+                } catch (JSONException e1) {
+                }
+            }
+        return null;
+    }
+
 
 }
 

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.davit.redcarpet.ApiConnector;
@@ -34,7 +35,6 @@ import java.util.Map;
 public class FriendActivity extends AppCompatActivity {
 
     private static final String TAG = "FriendActivity";
-    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
 
     ListView friendsList;
@@ -51,12 +51,18 @@ public class FriendActivity extends AppCompatActivity {
     private Dialog loading;
 
     JSONArray registredUsersLists=new JSONArray();
+    private TextView header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friend);
         friendsList = findViewById(R.id.friendslist);
+        View headerView = getLayoutInflater().inflate(R.layout.header_view, friendsList, false);
+        header = headerView.findViewById(R.id.headerTitle);
+        header.setText("Friends");
+        friendsList.addHeaderView(headerView);
+        friendsList.setEmptyView(findViewById(R.id.notFoundText));
 
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
         id = sp.getInt(user_id_sp, 0);
@@ -74,7 +80,7 @@ public class FriendActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
 
-                    JSONObject userClicked = registredUsersLists.getJSONObject(position);
+                    JSONObject userClicked = registredUsersLists.getJSONObject(position-1);
                     Intent showDetails = new Intent(getApplicationContext(), ViewProfileActivity.class);
                     showDetails.putExtra("org_id", userClicked.getInt("id"));
                     startActivity(showDetails);
@@ -91,7 +97,7 @@ public class FriendActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+            case Tools.PERMISSION_READ_CONTACTS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     contactList = getContactList();
@@ -107,7 +113,7 @@ public class FriendActivity extends AppCompatActivity {
 
     private Map<String, String> getContactList() {
         Map<String, String> contactList = new HashMap();
-        Boolean checkPermission = Tools.checkpermission(this, Manifest.permission.READ_CONTACTS, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        Boolean checkPermission = Tools.checkPermission(this, Manifest.permission.READ_CONTACTS, Tools.PERMISSION_READ_CONTACTS);
         if (checkPermission==null)
             return null;
         else if (!checkPermission) {

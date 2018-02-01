@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ListView Parties;
-    private JSONArray jsonArray;
+    private JSONArray jsonArray= new JSONArray();
 
     Context context=this;
     TextView nav_usr_name;
@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity
     public static final String user_id_sp = "ID";
     public static final String user_name_sp = "Name";
     public static final String token = "Token";
-    private Dialog loading;
-
+    private TextView emptyText;
+    private PartiesAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,14 @@ public class MainActivity extends AppCompatActivity
         pic = (CircleImageView) hView.findViewById(R.id.prof_pic);
         Parties = (ListView) findViewById(R.id.allpartylist);
 
-
+        View headerView = getLayoutInflater().inflate(R.layout.header_view, Parties, false);
+        ((TextView) headerView.findViewById(R.id.headerTitle)).setText("All parties");
+        Parties.addHeaderView(headerView);
+        emptyText=findViewById(R.id.notFoundText);
+        Parties.setEmptyView(emptyText);
+        listAdapter = new PartiesAdapter(jsonArray, this);
+        Parties.setAdapter(listAdapter);
+        // for debug init   getSharedPreferences(sp_Name, MODE_PRIVATE).edit().clear().commit();
         sp = getSharedPreferences(sp_Name, MODE_PRIVATE);
 
         id = sp.getInt(user_id_sp, 0);
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity
         if (id == 0 || user_name.length() == 0) {
             new MainActivity.GetUserByNumber().execute(new ApiConnector());
         }
+        //emptyList.setText("Loading parties...");
         nav_usr_name.setText(user_name);
         String url = Tools.IMAGES_URL + user_number + ".jpg";
         Log.e("url", url);
@@ -107,14 +115,14 @@ public class MainActivity extends AppCompatActivity
                 .error(R.drawable.prof_pic_def)
                 .into(pic);
 
-        loading = Tools.showLoading(this, "Loading parties...");
+        //emptyList = Tools.showLoading(this, "Loading parties...");
         new GetAllParties().execute(new ApiConnector());
         this.Parties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
 
-                    JSONObject productClicked = jsonArray.getJSONObject(position);
+                    JSONObject productClicked = jsonArray.getJSONObject(position-1);
                     Intent showDetails = new Intent(getApplicationContext(), PartyDetailsActivity.class);
                     showDetails.putExtra("PartyID", productClicked.getInt("id"));
                     startActivity(showDetails);
@@ -307,27 +315,29 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d("JSON_object","jsonArray_setListAdapter= "+jsonArray);
         this.jsonArray=jsonArray;
-        this.Parties.setAdapter(new PartiesAdapter(jsonArray,this));
-
+        listAdapter.setData(jsonArray);
+    }
+    public void setDialog(String message) {
+        emptyText.setText(message);
     }
     private class GetAllParties extends AsyncTask<ApiConnector,Long,JSONArray>
     {
         @Override
         protected JSONArray doInBackground(ApiConnector... params) {
+            setDialog("loading parties...");
+            //emptyList.getViewBy.setText("Loading parties...");
             return params[0].GetAllParties();
         }
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
-            loading.dismiss();
             if (jsonArray==null) {
-
-
+                setDialog("Connection error, try again");
                 Toast.makeText(getApplicationContext(),"Something goes wrong, please check you connection and try again",Toast.LENGTH_SHORT).show();
+            } else {
+                setDialog("No party found");
+                setListAdapter(jsonArray);
             }
-            setListAdapter(jsonArray);
-
-
         }
     }
 

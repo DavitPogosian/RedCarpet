@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -26,10 +27,20 @@ public class PartiesAdapter extends BaseAdapter {
     public static LayoutInflater inflater = null;
     public PartiesAdapter(JSONArray jsonArray, Activity a)
     {
+        super();
         this.dataArray=jsonArray;
         this.activity=a;
         inflater = (LayoutInflater) this.activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+
+    public JSONArray getData() {
+        return dataArray;
+    }
+    public void setData(JSONArray data) {
+        this.dataArray = data;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         try{
@@ -100,19 +111,5 @@ public class PartiesAdapter extends BaseAdapter {
         private TextView Start;
         private CircleImageView party_img;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

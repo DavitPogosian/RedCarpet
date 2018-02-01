@@ -94,7 +94,7 @@ public class NewProfileActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case Tools.PREMISSION_READ_PHONE: {
+            case Tools.PERMISSION_READ_PHONE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     setNumber();

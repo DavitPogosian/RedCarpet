@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.davit.redcarpet.ApiConnector;
 import com.example.davit.redcarpet.PartiesAdapter;
@@ -47,15 +48,20 @@ public class MyPartiesActivity extends AppCompatActivity {
 
 
         myPartylist= (ListView) findViewById(R.id.mypartylist);
+        View headerView = getLayoutInflater().inflate(R.layout.header_view, myPartylist, false);
+        ((TextView) headerView.findViewById(R.id.headerTitle)).setText("My parties");
+        myPartylist.addHeaderView(headerView);
+        myPartylist.setEmptyView(findViewById(R.id.notFoundText));
+
         new MyPartiesActivity.GetMyParties().execute(new ApiConnector());
         this.myPartylist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
 
-                    JSONObject productClicked = jsonArray.getJSONObject(position);
+                    JSONObject productClicked = jsonArray.getJSONObject(position-1);
                     Intent showDetails = new Intent(getApplicationContext(), EditMyPartyActivity.class);
-                    showDetails.putExtra("PartyID", productClicked.getInt("Id"));
+                    showDetails.putExtra("PartyID", productClicked.getInt("id"));
                     startActivity(showDetails);
                 } catch (JSONException e) {
                     e.printStackTrace();

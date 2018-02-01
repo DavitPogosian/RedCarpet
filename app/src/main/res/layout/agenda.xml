@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.davit.redcarpet.activity.AgendaActivity"
-    android:background="@drawable/back">
-    <LinearLayout
+    android:background="@drawable/back"
+    android:orientation="horizontal">
+    <TextView
+        android:id="@+id/notFoundText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-
-    <TextView
-        android:id="@+id/agentTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Agenda : Your next parties"
-        android:textAlignment="center"
-        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="No party found"
         android:textColor="@color/edittextText"
+        android:gravity="center"
         />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/agentTitle"
+
         android:id="@+id/nextPartylist" />
-    </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

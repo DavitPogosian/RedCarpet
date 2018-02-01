@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.example.davit.redcarpet.activity.FriendActivity"
     android:background="@drawable/back">
+    <TextView
+        android:id="@+id/notFoundText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="No friend found"
+        android:textColor="@color/edittextText"
+        android:gravity="center"
+        />
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
